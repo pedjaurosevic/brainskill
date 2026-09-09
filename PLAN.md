@@ -199,7 +199,7 @@ This document may be called the **final confirmatory plan**. It may not be calle
 | `modules/compiler.py` | Prompt compiler |
 | `modules/grader.py` | Deterministic grader + disagreement gate |
 | `benchmark/dataset.json` | 60 items, packets, graders |
-| `benchmark/run_battery.py` | **Exists.** OpenAI-compatible confirmatory runner: dual disagreement gate, allowlisted Domain-2 simulated tools, append-only JSONL, `--dry-run` planning for the full 1,440-trial matrix. Residual gaps: `SIMULATED_OUTPUTS` cover `d2.01`–`d2.06` only; Domain-2 tool-loop not yet timed for freeze. |
+| `benchmark/run_battery.py` | **Exists.** OpenAI-compatible confirmatory runner: dual disagreement gate, allowlisted Domain-2 simulated tools, append-only JSONL, `--dry-run` planning for the full 1,440-trial matrix. Residual gaps: `SIMULATED_OUTPUTS` cover `d2.01`–`d2.06` only; Domain-2 tool-loop smoke timed (see below). |
 | `types/jungian.json` | Parked |
 | `types/ALTERNATIVE_PARADIGMS.md` | Parked |
 

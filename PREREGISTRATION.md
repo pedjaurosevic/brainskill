@@ -52,6 +52,7 @@ RAG ON uses the frozen packet on each item (1 true + 2 distractors). RAG OFF omi
 - Seeds: 3 per cell, temperature 0.2, top_p 0.9.
 - Primary model: live TabbyAPI `Muse-Glimmer-30B-exl3-2.00bpw` on a local OpenAI-compatible inference server on loopback (host/port via env; not published).
 - Timed smoke 2026-09-09: Domain 1 item `d1.01`, 15.035 s, answer 4.7%.
+- Domain-2 tool-loop smoke 2026-09-09: `d2.01` cot RAG OFF seed 42, **73.34 s**, correct, 3 tool calls.
 - Expected local wall-clock: 8–24 h sequential including dual extra drafts.
 - Secondary: items `d1.01`–`d1.10`, RAG OFF, one seed, four conditions, Gemini 3.8 Flash and/or Grok.
 

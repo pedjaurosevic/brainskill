@@ -173,7 +173,7 @@ See also `RED_TEAM_AUDIT.md`.
 2. **Pattern scoring** on Domains 2 and 4 can miss good answers that use different words.
 3. **Fake tool outputs** now cover `d2.01`–`d2.12` (still simulated, not a live shell).
 4. **API retry** is coded (once, then JSONL failure row).
-5. **No timed Domain-2 tool loop** yet for the freeze checklist.
+5. Domain-2 tool-loop smoke (2026-09-09): item `d2.01`, condition `cot`, RAG OFF, seed 42, model `Muse-Glimmer-30B-exl3-2.00bpw` on local TabbyAPI loopback — **73.34 s** wall-clock, `correct=true`, `parse_ok=true`, 3 inspection tool calls, confidence 0.92. Freeze checklist timing item: **done**.
 6. On a heavily compressed model, written confidence may be empty talk.
 7. **Sixty tasks** can catch large, stable gains; small calibration gains may be invisible. A null H1 is still a result—not a reason to unpark the parked ideas.
 8. The check on bigger cloud models is only a direction check on ten tasks.
@@ -188,7 +188,7 @@ Before freeze:
 
 1. Compiler/grader tests pass — **done** (9).
 2. Record hashes of dataset, conditions, runner, PLAN, PREREG.
-3. Time one Domain-2 run with fake tools on the live model — **still needed**.
+3. Time one Domain-2 run with fake tools — **done** (d2.01 / 73.34 s).
 4. Confirm the live model id still matches the name we publish (or update the name).
 5. Finish fake outputs for `d2.07`–`d2.12`.
 6. Implement retry-once, then score as wrong.
