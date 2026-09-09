@@ -28,6 +28,11 @@ Rater: Grok 4.6 on the local research workstation. Method: read the tree, check 
 
 ---
 
+## Freeze — 2026-09-09 — in-repo freeze complete
+
+Tag `brainskill-freeze-v3.1`, see `FREEZE.md`. Domain-2 smoke 73.34 s. OSF/Zenodo registration still open. Study not run.
+
+
 ## v3.0 — 2026-09-09 — 716 / 1000
 
 **Object:** PLAN.md v3.0 plus aligned PREREG, methodology, benchmark JSON, compiler, grader, SKILL.md, red-team closures.

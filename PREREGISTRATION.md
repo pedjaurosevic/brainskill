@@ -1,11 +1,11 @@
 # Preregistration Protocol: BrainSkill Study
 
 **Title:** Label-blind operational protocols vs chain-of-thought on an edge LLM
-**Registry target:** OSF / Zenodo, after Domain-2 timing smoke, remaining tool sims, and file-hash freeze
+**Registry target:** OSF / Zenodo (tree frozen; upload pending)
 **Date of this draft:** 2026-09-09
-**Status:** Not yet registered. Not a DOI. `benchmark/run_battery.py` exists (`--dry-run` plans 1,440 trials; 9 compiler unit tests pass). Freeze still blocked on Domain-2 timed dry-run, completion of `d2.07`–`d2.12` simulated tool outputs, and HTTP retry-once implementation.
+**Status:** Tree **FROZEN** (`FREEZE.md`, tag `brainskill-freeze-v3.1`). Not yet registered on OSF/Zenodo. Not a DOI. Harness complete; Domain-2 smoke timed.
 
-This file must match `PLAN.md` v3.1. If they diverge, PLAN.md wins until both are edited together.
+This file must match `PLAN.md` v3.1-freeze. If they diverge, PLAN.md wins until both are edited together.
 
 ---
 
