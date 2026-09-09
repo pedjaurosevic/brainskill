@@ -1,0 +1,83 @@
+{
+  "version": "3.0.0",
+  "status": "confirmatory",
+  "notes": "Experimenter-facing labels stay in this file. The compiler emits only the system field plus the shared JSON contract. Model-facing strings must pass the denylist.",
+  "response_contract": {
+    "reasoning_trace": "string",
+    "chosen_action_or_answer": "string",
+    "calibration": {
+      "confidence": "float in [0,1]",
+      "weakest_premise": "string",
+      "falsification_check": "string"
+    }
+  },
+  "denylist": [
+    "INTJ",
+    "INTP",
+    "ENTJ",
+    "ENTP",
+    "INFJ",
+    "INFP",
+    "ENFJ",
+    "ENFP",
+    "ISTJ",
+    "ISFJ",
+    "ESTJ",
+    "ESFJ",
+    "ISTP",
+    "ISFP",
+    "ESTP",
+    "ESFP",
+    "MBTI",
+    "Myers-Briggs",
+    "Jungian",
+    "Jung",
+    "Luria",
+    "Kahneman",
+    "System 1",
+    "System 2",
+    "System-1",
+    "System-2",
+    "Friston",
+    "free energy",
+    "Sternberg",
+    "triarchic",
+    "Big Five",
+    "OCEAN",
+    "conscientiousness",
+    "extraversion",
+    "neuroticism",
+    "agreeableness",
+    "openness to experience",
+    "cognitive stack",
+    "cognitive function",
+    "persona",
+    "personality type",
+    "act like an"
+  ],
+  "shared_suffix": "Reply with JSON only using this schema: {\"reasoning_trace\": string, \"chosen_action_or_answer\": string, \"calibration\": {\"confidence\": number, \"weakest_premise\": string, \"falsification_check\": string}}. confidence must be a number in [0,1]. Do not wrap the JSON in markdown.",
+  "conditions": {
+    "cot": {
+      "id": "cot",
+      "experimenter_label": "Baseline chain-of-thought",
+      "system": "Think step by step before answering. Use only the information given and any tool results you receive."
+    },
+    "verify": {
+      "id": "verify",
+      "experimenter_label": "Label-blind verification protocol",
+      "system": "Follow this protocol exactly:\n1. State the claim in one sentence.\n2. Name the observation that would refute that claim.\n3. If a tool can obtain that observation, request the tool before concluding.\n4. Update the claim after evidence arrives.\n5. Set confidence in [0,1] to match remaining doubt. If evidence is missing, lower confidence rather than guessing."
+    },
+    "dual": {
+      "id": "dual",
+      "experimenter_label": "Label-blind dual-process (runner-side disagreement gate)",
+      "system": "Give your best immediate answer in the required JSON schema. Be concise. Do not request tools on this pass unless the question cannot be parsed.",
+      "system_on_conflict": "Two independent drafts disagreed. Re-solve using this protocol:\n1. State the claim in one sentence.\n2. Name the observation that would refute it.\n3. If a tool can obtain that observation, request it before concluding.\n4. Prefer the conservative reading of the evidence.\n5. Set confidence in [0,1] to match remaining doubt."
+    },
+    "high_c": {
+      "id": "high_c",
+      "experimenter_label": "High-verification operational vector",
+      "system": "Follow this protocol exactly:\n1. Before answering, list a short checklist of constraints, failure modes, and missing evidence.\n2. Mark each checklist item pass, fail, or not-applicable with a reason.\n3. Prefer the conservative action that preserves system integrity and does not destroy data.\n4. Do not fill gaps with guesses. If evidence is missing, say so and lower confidence.\n5. Keep the final answer terse: one claim, then the evidence that supports it."
+    }
+  },
+  "rag_preamble": "The following context documents were retrieved for this task. Some may be irrelevant or wrong. Use them only if they are actually evidential."
+}
