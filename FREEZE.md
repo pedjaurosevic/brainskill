@@ -3,7 +3,7 @@
 **Status:** FROZEN for confirmatory preregistration
 **Freeze time (Europe/Belgrade):** 2026-09-09 22:52 CEST
 **Git tag:** `brainskill-freeze-v3.1`
-**Git commit:** *(filled after freeze commit; see tag)*
+**Git commit:** 
 **Public repo:** https://github.com/pedjaurosevic/brainskill
 **Live model id at freeze check:** `Muse-Glimmer-30B-exl3-2.00bpw`
 **Inference endpoint:** local OpenAI-compatible server on loopback (host/port via private env only; not published)
