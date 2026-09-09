@@ -2,7 +2,7 @@
 
 **Document version:** 3.1-freeze
 **Date:** 2026-09-09
-**Status:** **FROZEN** for confirmatory prereg (`FREEZE.md`, tag `brainskill-freeze-v3.1`). Harness complete; Domain-2 smoke timed. Not yet OSF/Zenodo registered. Confirmatory study not yet run.
+**Status:** **FROZEN** for confirmatory prereg (`FREEZE.md`, tag `brainskill-freeze-v3.1`). Harness complete; Domain-2 smoke timed. OSF prereg submitted: https://osf.io/gzjrd/overview (Pending approval). Confirmatory study not yet run.
 **Authors:** Predrag Urošević
 **Primary substrate:** TabbyAPI on a local OpenAI-compatible inference server on loopback (host/port via env; not published), live model `Muse-Glimmer-30B-exl3-2.00bpw`, RTX 3060 12GB
 

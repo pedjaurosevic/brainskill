@@ -3,7 +3,7 @@
 **BrainSkill confirmatory study — whitepaper for review**  
 **Authors:** Predrag Urošević  
 **Document date:** 2026-09-09  
-**Status:** **FROZEN** (`FREEZE.md`, tag `brainskill-freeze-v3.1`). **Full experiment not yet run. No empirical results claimed.** OSF/Zenodo registration is next.  
+**Status:** **FROZEN** (`FREEZE.md`, tag `brainskill-freeze-v3.1`). **Full experiment not yet run. No empirical results claimed.** OSF preregistration submitted: https://osf.io/gzjrd/overview (Pending approval).  
 **Companion specs:** `PLAN.md` v3.1-freeze, `PREREGISTRATION.md`, `RED_TEAM_AUDIT.md`, `benchmark/TESTING_METHODOLOGY.md`
 
 ---

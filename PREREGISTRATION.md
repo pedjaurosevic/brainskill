@@ -3,7 +3,7 @@
 **Title:** Label-blind operational protocols vs chain-of-thought on an edge LLM
 **Registry target:** OSF / Zenodo (tree frozen; upload pending)
 **Date of this draft:** 2026-09-09
-**Status:** Tree **FROZEN** (`FREEZE.md`, tag `brainskill-freeze-v3.1`). Not yet registered on OSF/Zenodo. Not a DOI. Harness complete; Domain-2 smoke timed.
+**Status:** Tree **FROZEN** (`FREEZE.md`, tag `brainskill-freeze-v3.1`). OSF preregistration submitted: https://osf.io/gzjrd/overview (Pending approval). Project: https://osf.io/p9tcy/. Not a DOI yet. Confirmatory battery not run.
 
 This file must match `PLAN.md` v3.1-freeze. If they diverge, PLAN.md wins until both are edited together.
 

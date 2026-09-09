@@ -1,3 +1,7 @@
+## OSF — 2026-09-09 — prereg submitted
+
+https://osf.io/gzjrd/overview — Pending approval. Project https://osf.io/p9tcy/.
+
 # Scores
 
 Rater: Grok 4.6 on the local research workstation. Method: read the tree, check cited papers, score ten axes at 100 each. Not a run of the study.
