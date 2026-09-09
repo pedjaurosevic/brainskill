@@ -161,7 +161,7 @@ We treat **the task** as the unit we want to generalize to. The three seeds are 
 | :--- | :--- |
 | `benchmark/dataset.json` | `bb3ab75a3701064642c8694610b579cb28ebb0167cc371ce4d5048e2e5a3d086` |
 | `types/conditions.json` | `76179e1bd48a3a986f02317ef043bf96737a930d9a69547c620689b792d90f1e` |
-| `benchmark/run_battery.py` | `3c5a9be8e001c85e876c935ad729b9403f9c6eef662d78ad4d4f64553bbe2d83` |
+| `benchmark/run_battery.py` | `e21fd66b592a1802d23beb960e3fd8ea4d7606d0d9de9dca0a3023cae02819b9` |
 
 ---
 
@@ -171,8 +171,8 @@ See also `RED_TEAM_AUDIT.md`.
 
 1. **Longer prompts.** Check-yourself and checklist text is longer than step-by-step. A same-length "just be careful" control is not in this design.
 2. **Pattern scoring** on Domains 2 and 4 can miss good answers that use different words.
-3. **Fake tool outputs** are only filled in for tasks `d2.01`–`d2.06`; `d2.07`–`d2.12` still get a generic stub.
-4. **API retry** rule from the prereg is not coded yet.
+3. **Fake tool outputs** now cover `d2.01`–`d2.12` (still simulated, not a live shell).
+4. **API retry** is coded (once, then JSONL failure row).
 5. **No timed Domain-2 tool loop** yet for the freeze checklist.
 6. On a heavily compressed model, written confidence may be empty talk.
 7. **Sixty tasks** can catch large, stable gains; small calibration gains may be invisible. A null H1 is still a result—not a reason to unpark the parked ideas.

@@ -101,7 +101,37 @@ SIMULATED_OUTPUTS = {
         r"df\s+-i": "Filesystem      Inodes   IUsed   IFree IUse% Mounted on\n/dev/nvme0n1p3 1000000 1000000       0  100% /var",
         r"df\s+-h": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/nvme0n1p3   50G   10G   40G   20% /var",
     },
+    "d2.07": {
+        r"ss\s+": "State  Recv-Q  Send-Q  Local Address:Port  Peer Address:Port\nLISTEN 0       128          *:8080              *:*\n# note: socket is IPv6 [::]:8080; ipv6only=1 so 127.0.0.1:8080 is refused",
+        r"sysctl.*ipv6|cat.*/proc/sys/net/ipv6": "net.ipv6.bindv6only = 1",
+        r"curl|nc\s+": "connect to 127.0.0.1 port 8080: Connection refused\nconnect to ::1 port 8080: succeeded",
+    },
+    "d2.08": {
+        r"systemctl\s+show|systemctl\s+cat": "After=network-online.target\nWants=\nRequires=\n# After= orders only if both units start; it does not pull network-online.target",
+        r"cat.*/etc/systemd|network-online": "[Unit]\nDescription=example\nAfter=network-online.target\n# missing Wants=/Requires=network-online.target",
+    },
+    "d2.09": {
+        r"getent|host\s+|dig\s+|nslookup": ";; connection timed out; no servers could be reached\nNXDOMAIN or SERVFAIL for db.internal",
+        r"resolv\.conf|cat.*/etc/resolv": "nameserver 10.255.255.1\n# no search domain; resolver unreachable from this namespace",
+        r"nsswitch|ping\s+": "PING 10.0.0.12: 64 bytes from 10.0.0.12: icmp_seq=1 ttl=64\ngetent hosts db.internal: (empty)",
+    },
+    "d2.10": {
+        r"getfacl": "# file: secret.txt\nuser::rw-\nuser:user:---\ngroup::r--\nmask::r--\nother::r--",
+        r"lsattr": "----i---------e---- secret.txt",
+        r"ausearch|journalctl.*(?:apparmor|selinux)|aa-status|getenforce": "apparmor=\"DENIED\" operation=\"open\" profile=\"example\" name=\"/home/researcher/secret.txt\"",
+    },
+    "d2.11": {
+        r"dmesg|journalctl": "Memory cgroup out of memory: Killed process 9911 (worker) total-vm:8192000kB, anon-rss:7800000kB\nmemory.max for cgroup /system.slice/worker.service = 2G",
+        r"systemctl\s+show|MemoryMax|memory\.max": "MemoryMax=2G\nMemoryHigh=1.5G\n# host free RAM is irrelevant once the cgroup limit is hit",
+        r"free\s+-h": "Mem:  total 32Gi  used 8Gi  free 20Gi  available 22Gi\nSwap: total 8Gi  used 0B  free 8Gi",
+    },
+    "d2.12": {
+        r"locale|echo\s+\$L": "LANG=\nLC_ALL=\n# cron environment often has empty LANG (C / ASCII)",
+        r"crontab|cron": "SHELL=/bin/sh\nPATH=/usr/bin:/bin\n# no LANG=C.UTF-8 — interactive shell had LANG=en_US.UTF-8",
+        r"python|backup": "UnicodeEncodeError: 'ascii' codec can't encode character '\\xf6' in position 12",
+    },
 }
+
 
 
 def simulate_tool_execution(item_id: str, tool_name: str, arguments: dict[str, Any]) -> str:
@@ -125,8 +155,9 @@ def call_chat_completion(
     seed: int | None = None,
     tools: list[dict[str, Any]] | None = None,
     timeout: int = 120,
+    max_attempts: int = 2,
 ) -> dict[str, Any]:
-    """Execute a single chat completion POST against an OpenAI-compatible endpoint."""
+    """POST /chat/completions. Retry once on transport/HTTP failure (same seed/payload)."""
     url = f"{api_url.rstrip('/')}/chat/completions"
     payload: dict[str, Any] = {
         "model": model,
@@ -144,13 +175,19 @@ def call_chat_completion(
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
 
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers=headers,
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        return json.loads(response.read().decode("utf-8"))
+    body = json.dumps(payload).encode("utf-8")
+    last_error: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        req = urllib.request.Request(url, data=body, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError) as exc:
+            last_error = exc
+            if attempt >= max_attempts:
+                break
+    assert last_error is not None
+    raise last_error
 
 
 def run_single_turn(
@@ -432,7 +469,36 @@ def main() -> None:
             with out_path.open("a", encoding="utf-8") as out_f:
                 out_f.write(json.dumps(result, ensure_ascii=False) + "\n")
         except Exception as exc:
+            # Prereg: after retry-once inside call_chat_completion, record y=0 / parse_ok=false.
             print(f" ERROR: {exc}")
+            fail_row = {
+                "item_id": it["id"],
+                "domain": it.get("domain"),
+                "condition": cond,
+                "rag": "ON" if rag_on else "OFF",
+                "seed": seed,
+                "timestamp": time.time(),
+                "conflict": None,
+                "scored_draft": "failed",
+                "raw_response": "",
+                "wall_clock_seconds": None,
+                "tool_calls": [],
+                "tool_used": False,
+                "error": str(exc),
+                "grade": {
+                    "item_id": it["id"],
+                    "correct": False,
+                    "parse_ok": False,
+                    "extracted": "",
+                    "canonical": "",
+                    "confidence": None,
+                    "errors": [str(exc)],
+                    "required_missing": [],
+                    "forbidden_hit": [],
+                },
+            }
+            with out_path.open("a", encoding="utf-8") as out_f:
+                out_f.write(json.dumps(fail_row, ensure_ascii=False) + "\n")
         completed += 1
 
     print(f"\nFinished {completed} trials. Passed: {passed}/{completed} ({(passed/completed*100) if completed else 0:.1f}%)")

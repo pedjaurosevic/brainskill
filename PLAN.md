@@ -199,7 +199,7 @@ This document may be called the **final confirmatory plan**. It may not be calle
 | `modules/compiler.py` | Prompt compiler |
 | `modules/grader.py` | Deterministic grader + disagreement gate |
 | `benchmark/dataset.json` | 60 items, packets, graders |
-| `benchmark/run_battery.py` | **Exists.** OpenAI-compatible confirmatory runner: dual disagreement gate, allowlisted Domain-2 simulated tools, append-only JSONL, `--dry-run` planning for the full 1,440-trial matrix. Residual gaps: `SIMULATED_OUTPUTS` cover `d2.01`–`d2.06` only; HTTP retry-once / fail-as-y=0 not yet on the exception path; Domain-2 tool-loop not yet timed. |
+| `benchmark/run_battery.py` | **Exists.** OpenAI-compatible confirmatory runner: dual disagreement gate, allowlisted Domain-2 simulated tools, append-only JSONL, `--dry-run` planning for the full 1,440-trial matrix. Residual gaps: `SIMULATED_OUTPUTS` cover `d2.01`–`d2.06` only; Domain-2 tool-loop not yet timed for freeze. |
 | `types/jungian.json` | Parked |
 | `types/ALTERNATIVE_PARADIGMS.md` | Parked |
 
@@ -211,7 +211,7 @@ Recorded 2026-09-09 for continuity. Re-hash at freeze; these are not an OSF snap
 | :--- | :--- |
 | `benchmark/dataset.json` | `bb3ab75a3701064642c8694610b579cb28ebb0167cc371ce4d5048e2e5a3d086` |
 | `types/conditions.json` | `76179e1bd48a3a986f02317ef043bf96737a930d9a69547c620689b792d90f1e` |
-| `benchmark/run_battery.py` | `3c5a9be8e001c85e876c935ad729b9403f9c6eef662d78ad4d4f64553bbe2d83` |
+| `benchmark/run_battery.py` | `e21fd66b592a1802d23beb960e3fd8ea4d7606d0d9de9dca0a3023cae02819b9` |
 
 ---
 
