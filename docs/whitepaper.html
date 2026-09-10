@@ -49,7 +49,7 @@
         To isolate the true procedural effect from superficial roleplay or training-data priming, our design is strictly <strong>label-blind</strong>: the model is never assigned a persona, personality type, or psychologist role (e.g., “act like an INTJ” or “think like Kahneman”). It receives only cold, operational steps.
       </p>
       <p>
-        We evaluate <strong>four instruction protocols</strong> (<code>cot</code> baseline, <code>verify</code> self-check, <code>dual</code> independent drafting, and <code>high_c</code> strict checklist), tested both with and without reference documents, across <strong>60 diverse tasks</strong> spanning probability traps, Linux systems debugging, safety refusals, and noise filtering. Each condition is repeated across 3 random seeds, producing <strong>1,440 fully scored trials</strong> evaluated against deterministic, regex-hardened ground truth on a single 12 GB GPU (<code>Muse-Glimmer-30B-exl3-2.00bpw</code>), cross-validated on Gemini Flash.
+        We evaluate <strong>four instruction protocols</strong> (<code>cot</code> baseline, <code>verify</code> self-check, <code>dual</code> independent drafting, and <code>high_c</code> strict checklist), tested both with and without reference documents, across <strong>60 diverse tasks</strong> spanning probability traps, Linux systems debugging, safety refusals, and noise filtering. Each condition is repeated across 3 random seeds, producing <strong>1,440 fully scored trials</strong> evaluated against deterministic, regex-hardened ground truth on a single 12 GB GPU (<code>Muse-Glimmer-30B-exl3-2.00bpw</code>), cross-validated on Gemini Flash. Crucially, to prevent post-hoc hypothesis fitting (HARKing), all hypotheses (H1–H3), evaluation metrics (MCE, Brier, GDI), and analysis plans were formally preregistered on the Open Science Framework (OSF: <a href="https://osf.io/gzjrd/overview">osf.io/gzjrd/overview</a>) and frozen in git under tag <code>brainskill-freeze-v3.1</code> <em>before</em> data collection began.
       </p>
       <div class="callout">
         <strong>Key empirical findings:</strong>
@@ -266,7 +266,7 @@
 
       <h3>3.8 Statistics, in plain terms</h3>
       <p>
-        We treat <strong>the task</strong> as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. The statistical pipeline is implemented in <code>analysis/analyze.py</code>.
+        We treat <strong>the task</strong> as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. All hypotheses, analysis formulas, and test batteries were locked in advance on the Open Science Framework (OSF) to eliminate <em>p-hacking</em> and selective post-hoc reporting. The statistical pipeline is implemented in <code>analysis/analyze.py</code>.
       </p>
     </section>
 

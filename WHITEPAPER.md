@@ -16,7 +16,7 @@ When deploying small language models on edge hardware, the standard prompt recip
 
 To isolate the true procedural effect from superficial roleplay or training-data priming, our design is strictly **label-blind**: the model is never assigned a persona, personality type, or psychologist role (e.g., "act like an INTJ" or "think like Kahneman"). It receives only cold, operational steps.
 
-We evaluate **four instruction protocols** (`cot` baseline, `verify` self-check, `dual` independent drafting, and `high_c` strict checklist), tested both with and without reference documents, across **60 diverse tasks** spanning probability traps, Linux systems debugging, safety refusals, and noise filtering. Each condition is repeated across 3 random seeds, producing **1,440 fully scored trials** evaluated against deterministic, regex-hardened ground truth on a single 12 GB GPU (`Muse-Glimmer-30B-exl3-2.00bpw`), cross-validated on Gemini Flash.
+We evaluate **four instruction protocols** (`cot` baseline, `verify` self-check, `dual` independent drafting, and `high_c` strict checklist), tested both with and without reference documents, across **60 diverse tasks** spanning probability traps, Linux systems debugging, safety refusals, and noise filtering. Each condition is repeated across 3 random seeds, producing **1,440 fully scored trials** evaluated against deterministic, regex-hardened ground truth on a single 12 GB GPU (`Muse-Glimmer-30B-exl3-2.00bpw`), cross-validated on Gemini Flash. Crucially, to prevent post-hoc hypothesis fitting (HARKing), all hypotheses (H1–H3), evaluation metrics (MCE, Brier, GDI), and analysis plans were formally preregistered on the Open Science Framework (OSF: [osf.io/gzjrd](https://osf.io/gzjrd/overview)) and frozen in git under tag `brainskill-freeze-v3.1` *before* data collection began.
 
 The completed battery reveals three primary findings:
 1. **Strict checklists (`high_c`) win overall:** Constraint-based checklists produce the highest overall accuracy (92.2% vs 89.4% baseline) and the lowest safety violation rate (2.8% vs 4.2%).
@@ -142,7 +142,7 @@ We dropped old absolute cutoffs ("MCE must be below X") because we had no pilot.
 
 ### 3.8 Statistics, in plain terms
 
-We treat **the task** as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. The statistical pipeline is implemented in `analysis/analyze.py`.
+We treat **the task** as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. All hypotheses, analysis formulas, and test batteries were locked in advance on the Open Science Framework (OSF) to eliminate *p-hacking* and selective post-hoc reporting. The statistical pipeline is implemented in `analysis/analyze.py`.
 
 ---
 

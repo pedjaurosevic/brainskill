@@ -63,6 +63,7 @@
         <div class="stat"><div class="k">Scored trials</div><div class="v">1,440</div><div class="s">item = generalization unit</div></div>
         <div class="stat"><div class="k">Grading</div><div class="v">Deterministic</div><div class="s">no LLM-as-judge</div></div>
         <div class="stat"><div class="k">Blinding</div><div class="v">Denylist</div><div class="s">no INTJ / Kahneman / System&nbsp;1 in prompts</div></div>
+        <div class="stat"><div class="k">Preregistration</div><div class="v"><a href="https://osf.io/gzjrd/">OSF: gzjrd</a></div><div class="s">Hypotheses frozen before run</div></div>
       </div>
 
       <h3>Conditions (what the model saw)</h3>
@@ -136,7 +137,12 @@
 
     <section id="hypotheses">
       <h2>4. What happened to our predictions?</h2>
-      <p>Here is what the data proved in plain terms versus our formal preregistered claims:</p>
+      <p>
+        To prevent <em>HARKing</em> (Hypothesizing After Results are Known — altering claims to fit the data),
+        every hypothesis, test metric, and statistical threshold was formally registered on the Open Science Framework
+        (<a href="https://osf.io/gzjrd/">OSF: gzjrd</a>) and frozen in Git before running a single trial.
+        Here is how our preregistered predictions held up against real empirical data:
+      </p>
       <table>
         <thead>
           <tr><th>Question & Hypothesis</th><th>What we asked</th><th>What actually happened</th><th class="num">Formal Stat</th></tr>

@@ -3,7 +3,8 @@
 **Label-blind operational protocols vs chain-of-thought on an edge LLM**  
 Confirmatory study by Predrag Urošević (2026).
 
-> Public results poster: **https://pedjaurosevic.github.io/brainskill/** · [Read Whitepaper](https://pedjaurosevic.github.io/brainskill/whitepaper.html)
+> Public results poster: **https://pedjaurosevic.github.io/brainskill/** · [Read Whitepaper](https://pedjaurosevic.github.io/brainskill/whitepaper.html)  
+> **Preregistered Confirmatory Study:** All hypotheses (H1–H3), evaluation metrics (MCE, Brier, GDI), and statistical models were formally preregistered on the Open Science Framework ([OSF: gzjrd](https://osf.io/gzjrd/)) and locked in git under tag `brainskill-freeze-v3.1` *before* running any experimental trials, eliminating post-hoc hypothesis fitting (HARKing).
 
 ## One-sentence result
 
