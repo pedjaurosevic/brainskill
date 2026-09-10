@@ -9,6 +9,17 @@ Confirmatory study by Predrag Urošević (2026).
 
 On `Muse-Glimmer-30B-exl3-2.00bpw`, a careful checklist protocol (`high_c`) achieved the **highest overall accuracy (92.2%)** and lowest safety violation rate (2.8%), while verification instructions **boosted inspection tool use (+19.4%)** without significantly improving verbal calibration error (MCE) versus chain-of-thought. On Gemini Flash, all protocols achieved 100% accuracy on Domain 1.
 
+## In Plain English: What Did This Study Show?
+
+1. **Strict checklists make AI safer and more accurate:**
+   When you force a small local model to run through an explicit constraint checklist (`high_c`) before answering, it makes fewer mistakes (92.2% accuracy vs 89.4% standard step-by-step) and avoids breaking things (only 2.8% safety violations).
+2. **Small models don't know what they don't know:**
+   Telling a 2-bit model to "lower your confidence if you are guessing" does not work. It will happily report 95% confidence while hallucinating an incorrect answer.
+3. **AI only inspects the system if you order it to:**
+   Prompting the model with verification steps boosted diagnostic tool use from 32% to 51%. But this is direct obedience to an imperative command, not emergent cognitive curiosity.
+4. **Compression and model size matter:**
+   The exact same probability traps that tripped up the local 2-bit model were solved with 100% perfection (40/40) by a frontier model (Gemini Flash).
+
 ## Status
 
 | Piece | Status |

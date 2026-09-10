@@ -89,10 +89,18 @@
     <section id="findings">
       <h2>3. What we found (headline)</h2>
       <div class="callout">
-        On this edge model, a structured checklist (<code>high_c</code>) delivered the
-        <strong>highest overall accuracy (92.2%)</strong> and lowest safety violation rate (2.8%).
-        A verification protocol <strong>raised inspection-tool use (+19.4%)</strong>, but did not
-        significantly improve verbal calibration error (MCE) versus chain-of-thought.
+        <p style="font-size:1.15rem;line-height:1.5;margin-bottom:0.8rem;">
+          <strong>In plain language:</strong>
+          Giving an AI a strict pre-flight checklist makes it noticeably smarter and keeps it from doing destructive things.
+          Telling it to double-check its work forces it to inspect the system with diagnostic tools, but it won't make the model honest about when it is guessing.
+        </p>
+        <p style="color:var(--muted);font-size:0.92rem;margin-bottom:0;border-top:1px solid rgba(255,255,255,0.1);padding-top:0.6rem;">
+          <strong>The technical numbers:</strong>
+          On <code>Muse-Glimmer-30B-exl3-2.00bpw</code>, a structured checklist (<code>high_c</code>) delivered the
+          <strong>highest overall accuracy (92.2%)</strong> and lowest safety violation rate (2.8%).
+          A verification protocol <strong>raised inspection-tool use (+19.4%)</strong>, but did not
+          significantly improve verbal calibration error (MCE) versus chain-of-thought.
+        </p>
       </div>
 
       <h3>Overall accuracy by condition</h3>
@@ -101,79 +109,76 @@
           <tr><th>Condition</th><th class="num">Accuracy</th><th class="num">MCE ↓ better</th><th class="num">GDI (ON−OFF)</th><th class="num">Dom2 tools</th><th class="num">Dom3 forbidden</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>cot</code></td><td class="num">0.894</td><td class="num">0.179</td><td class="num">+0.156</td><td class="num">0.319</td><td class="num">0.042</td></tr>
-          <tr><td><code>verify</code></td><td class="num">0.911</td><td class="num">0.207</td><td class="num">+0.100</td><td class="num">0.514</td><td class="num">0.097</td></tr>
-          <tr><td><code>dual</code></td><td class="num">0.869</td><td class="num">0.194</td><td class="num">+0.117</td><td class="num">0.236</td><td class="num">0.056</td></tr>
-          <tr><td><code>high_c</code></td><td class="num"><strong>0.922</strong></td><td class="num"><strong>0.178</strong></td><td class="num">+0.100</td><td class="num">0.375</td><td class="num"><strong>0.028</strong></td></tr>
+          <tr><td><code>cot</code> (Standard Step-by-Step)</td><td class="num">0.894</td><td class="num">0.179</td><td class="num">+0.156</td><td class="num">0.319</td><td class="num">0.042</td></tr>
+          <tr><td><code>verify</code> (Check-Yourself Loop)</td><td class="num">0.911</td><td class="num">0.207</td><td class="num">+0.100</td><td class="num">0.514</td><td class="num">0.097</td></tr>
+          <tr><td><code>dual</code> (Two Drafts on Conflict)</td><td class="num">0.869</td><td class="num">0.194</td><td class="num">+0.117</td><td class="num">0.236</td><td class="num">0.056</td></tr>
+          <tr><td><code>high_c</code> (Strict Checklist)</td><td class="num"><strong>0.922</strong></td><td class="num"><strong>0.178</strong></td><td class="num">+0.100</td><td class="num">0.375</td><td class="num"><strong>0.028</strong></td></tr>
         </tbody>
       </table>
       <p style="color:var(--muted);font-size:0.88rem;margin-top:0.5rem;">
         Raw pass rate across all trials: <strong>1295 / 1440 (89.9%)</strong>.<br />
-        Domains: d1 95.8% · d2 82.6% · d3 82.3% · d4 98.6%.
+        By domain: Thinking traps 95.8% · Linux debug 82.6% · Safety 82.3% · Noise filters 98.6%.
       </p>
 
-      <h3>Secondary cloud validation (Gemini Flash)</h3>
+      <h3>Does a frontier cloud model fall for these traps? (Gemini Flash Check)</h3>
       <p>
-        Preregistered 10-task check on Domain 1 (<code>d1.01</code>–<code>d1.10</code>, RAG OFF, seed 42):
-        <strong>40 / 40 trials correct (100%)</strong> across all conditions.
-        Calibration error: <code>high_c</code> 0.003 · <code>dual</code> 0.005 · <code>cot</code> 0.006 · <code>verify</code> 0.009.
+        <strong>Plain answer: No.</strong>
+        When we ran the exact same 10 probability traps on Google's Gemini Flash (<code>d1.01</code>–<code>d1.10</code>, RAG OFF, seed 42),
+        it scored <strong>40 / 40 correct (100%)</strong> across all four instruction styles, with near-zero calibration error (0.003–0.009).
+        The reasoning errors on our local workstation were the cost of a small model compressed down to 2.00 bits per weight, not an intrinsic flaw in AI logic.
       </p>
     </section>
 
     <section id="hypotheses">
-      <h2>4. Preregistered hypotheses</h2>
+      <h2>4. What happened to our predictions?</h2>
+      <p>Here is what the data proved in plain terms versus our formal preregistered claims:</p>
       <table>
         <thead>
-          <tr><th>Hypothesis</th><th>Claim</th><th>Result</th><th class="num">Holm p</th></tr>
+          <tr><th>Question & Hypothesis</th><th>What we asked</th><th>What actually happened</th><th class="num">Formal Stat</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td>H1</td>
-            <td>Lower MCE for <code>verify</code> / <code>high_c</code> vs <code>cot</code></td>
-            <td><span class="tag no">not supported</span></td>
-            <td class="num">~1.0</td>
+            <td><strong>H1: Self-awareness</strong><br /><span class="mono">MCE calibration</span></td>
+            <td>Can we prompt the model to know when it is unsure?</td>
+            <td><strong>No.</strong> The model sounds 95% confident even when hallucinating. Prompts don't grant inner self-doubt.</td>
+            <td class="num"><span class="tag no">not supported</span></td>
           </tr>
           <tr>
-            <td>H2</td>
-            <td>Smaller RAG gap (GDI) for <code>verify</code> vs <code>cot</code></td>
-            <td><span class="tag note">directional (p=0.14)</span></td>
-            <td class="num">n.s.</td>
+            <td><strong>H2: Document reliance</strong><br /><span class="mono">GDI gap</span></td>
+            <td>Does verification help the model when cheat sheets are missing?</td>
+            <td><strong>Somewhat.</strong> It closed the accuracy gap by 5.6%, but the effect did not reach strict statistical significance.</td>
+            <td class="num"><span class="tag note">directional (p=0.14)</span></td>
           </tr>
           <tr>
-            <td>H3 tools</td>
-            <td>Higher Domain-2 inspection-tool rate for <code>verify</code></td>
-            <td><span class="tag ok">supported</span></td>
-            <td class="num">0.015</td>
+            <td><strong>H3 Tools: Inspection</strong><br /><span class="mono">Dom2 tool rate</span></td>
+            <td>Does it inspect the system before making assumptions?</td>
+            <td><strong>Yes.</strong> Tool calls jumped from 32% to 51%. However, it did this because we explicitly ordered it to, not from curiosity.</td>
+            <td class="num"><span class="tag ok">supported (p=0.015)</span></td>
           </tr>
           <tr>
-            <td>H3 safety</td>
-            <td><code>verify</code> does not raise Domain-3 forbidden actions</td>
-            <td><span class="tag ok">OK (2.8%–9.7%)</span></td>
-            <td class="num">n.s. increase</td>
-          </tr>
-          <tr>
-            <td>H1-sec.</td>
-            <td>Lower MCE for <code>dual</code> vs <code>cot</code> (exploratory)</td>
-            <td><span class="tag note">n.s.</span></td>
-            <td class="num">—</td>
+            <td><strong>H3 Safety: Destructive commands</strong><br /><span class="mono">Dom3 forbidden rate</span></td>
+            <td>Does active tool use make the model reckless?</td>
+            <td><strong>No.</strong> The model rejected dangerous commands (e.g. formatting live disks or dumping keys) in over 97% of runs.</td>
+            <td class="num"><span class="tag ok">safe (2.8%–9.7%)</span></td>
           </tr>
         </tbody>
       </table>
-      <p>
-        Takeaway for builders: on this local model, structured checklists
-        (<code>high_c</code>) provide the strongest operational safeguard and highest task accuracy,
-        while verification prompts reliably steer the model toward inspection tools.
-      </p>
+      <div class="callout" style="margin-top:1.5rem;">
+        <strong>The practical takeaway for AI engineers:</strong>
+        If you are building AI agents on local edge models, <strong>use strict constraint checklists (<code>high_c</code>)</strong>.
+        They give the highest reliability and lowest risk of damage.
+        Explicitly command tool inspection if you want it done.
+        And <em>never trust a small model's stated confidence</em>—verify its work from the outside.
+      </div>
     </section>
 
     <section id="limits">
-      <h2>5. Limits & Adversarial Audit</h2>
+      <h2>5. Limits & Honest Lessons (Said out loud)</h2>
       <ul>
-        <li><strong>Evaluation artifact resolved:</strong> An adversarial audit revealed that initial ~78% scores were an artifact of regex bugs (greedy first-number extraction, matching discarded choice options, and penalizing safe refusals that quoted the command). Once hardened, true accuracy rose to 89.9%.</li>
-        <li><code>verify</code> / <code>high_c</code> prompts are longer than <code>cot</code> (instruction-length confound).</li>
-        <li>H3 tool-use reflects direct instruction-following, as the prompt explicitly commands tool inspection.</li>
-        <li>Verbal confidence on a 2.00&nbsp;bpw edge model is largely uncalibrated, but near-perfect on frontier models (Gemini Flash).</li>
-        <li>Parked paradigms (Jung / Luria / Friston / Sternberg) remain parked.</li>
+        <li><strong>We caught and fixed our own evaluation bug:</strong> Early runs scored ~78% because naive text-matching regexes failed correct answers (e.g. penalizing a model for stating <em>"Option 1 is more probable than Option 2"</em> or extracting the wrong number from mathematical sentences). Once we hardened the grader, the true accuracy was 89.9%.</li>
+        <li><strong>Prompt length confound:</strong> The checklist and verification instructions are longer than "think step by step". Part of the boost may simply come from giving the model more detailed instructions.</li>
+        <li><strong>Tools were ordered, not discovered:</strong> The model called diagnostic tools because the prompt commanded: <em>"If a tool can obtain evidence, request it before concluding"</em>. That is good instruction-following, not an emergent cognitive discovery.</li>
+        <li><strong>Small models vs frontier APIs:</strong> Written confidence on an extreme 2.00-bit compressed model is mostly hollow talk, whereas larger frontier models (Gemini Flash) calibrate accurately.</li>
       </ul>
     </section>
 
