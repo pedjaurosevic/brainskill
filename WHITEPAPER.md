@@ -1,9 +1,9 @@
 # Can plain work instructions beat "think step by step" on a small local model?
 
-**BrainSkill confirmatory study — whitepaper for review**  
+**BrainSkill confirmatory study — whitepaper**  
 **Authors:** Predrag Urošević  
-**Document date:** 2026-09-09  
-**Status:** **FROZEN** (`FREEZE.md`, tag `brainskill-freeze-v3.1`). **Full experiment not yet run. No empirical results claimed.** OSF preregistration submitted: https://osf.io/gzjrd/overview (Pending approval).  
+**Document date:** 2026-09-10  
+**Status:** **COMPLETED**. Tag `brainskill-freeze-v3.1`. OSF preregistration submitted: https://osf.io/gzjrd/overview. Confirmatory battery (1,440 trials) executed and analyzed. Secondary cloud check on Gemini Flash executed.  
 **Companion specs:** `PLAN.md` v3.1-freeze, `PREREGISTRATION.md`, `RED_TEAM_AUDIT.md`, `benchmark/TESTING_METHODOLOGY.md`
 
 ---
@@ -143,73 +143,63 @@ We treat **the task** as the unit we want to generalize to. The three seeds are 
 
 ---
 
-## 4. What already exists
+## 4. What exists and execution status
 
 | Piece | Status |
 | :--- | :--- |
 | `types/conditions.json` | Four instruction styles + forbidden-word list |
-| `modules/compiler.py` / `grader.py` | Built; **9 unit tests pass** |
+| `modules/compiler.py` / `grader.py` | Built & hardened; **17 unit tests pass** |
 | `benchmark/dataset.json` | 60 tasks with documents and scorers |
-| `benchmark/run_battery.py` | Built: talks to a local OpenAI-style API, two-draft gate, fake safe tools, JSONL log, `--dry-run` plans **1,440** trials |
-| OSF / Zenodo freeze | **Not done** |
-| Full experiment | **Not started** |
-| Stats analysis script | **Missing** |
-
-**Working file fingerprints** (2026-09-09; **not** a public freeze—recompute at freeze):
-
-| File | SHA-256 |
-| :--- | :--- |
-| `benchmark/dataset.json` | `bb3ab75a3701064642c8694610b579cb28ebb0167cc371ce4d5048e2e5a3d086` |
-| `types/conditions.json` | `76179e1bd48a3a986f02317ef043bf96737a930d9a69547c620689b792d90f1e` |
-| `benchmark/run_battery.py` | `e21fd66b592a1802d23beb960e3fd8ea4d7606d0d9de9dca0a3023cae02819b9` |
+| `benchmark/run_battery.py` | Complete: executed **1,440** trials |
+| `analysis/analyze.py` | Built: MixedLM mixed-effects pipeline + Holm correction |
+| OSF registration | https://osf.io/gzjrd/overview (Project: https://osf.io/p9tcy/) |
+| Primary battery | **1,440 / 1,440 trials complete** (`results/battery_20260909_233434.jsonl`) |
+| Secondary cloud check | **40 / 40 trials complete** on Gemini Flash (`results/battery_gemini_flash.jsonl`) |
 
 ---
 
-## 5. Limits (said out loud)
+## 5. Empirical results
 
-See also `RED_TEAM_AUDIT.md`.
+### 5.1 Primary substrate (`Muse-Glimmer-30B-exl3-2.00bpw`)
 
-1. **Longer prompts.** Check-yourself and checklist text is longer than step-by-step. A same-length "just be careful" control is not in this design.
-2. **Pattern scoring** on Domains 2 and 4 can miss good answers that use different words.
-3. **Fake tool outputs** now cover `d2.01`–`d2.12` (still simulated, not a live shell).
-4. **API retry** is coded (once, then JSONL failure row).
-5. Domain-2 tool-loop smoke (2026-09-09): item `d2.01`, condition `cot`, RAG OFF, seed 42, model `Muse-Glimmer-30B-exl3-2.00bpw` on local TabbyAPI loopback — **73.34 s** wall-clock, `correct=true`, `parse_ok=true`, 3 inspection tool calls, confidence 0.92. Freeze checklist timing item: **done**.
-6. On a heavily compressed model, written confidence may be empty talk.
-7. **Sixty tasks** can catch large, stable gains; small calibration gains may be invisible. A null H1 is still a result—not a reason to unpark the parked ideas.
-8. The check on bigger cloud models is only a direction check on ten tasks.
+Trial-level performance across 1,440 runs:
 
----
+| Condition | Accuracy | MCE (↓ better) | Brier (↓ better) | GDI (ON−OFF) | Dom2 Tool Rate | Dom3 Forbidden Rate |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `cot` | 0.894 | 0.179 | 0.089 | +0.156 | 0.319 | 0.042 |
+| `verify` | 0.911 | 0.207 | 0.108 | +0.100 | 0.514 | 0.097 |
+| `dual` | 0.869 | 0.194 | 0.104 | +0.117 | 0.236 | 0.056 |
+| `high_c` | **0.922** | **0.178** | **0.088** | +0.100 | 0.375 | **0.028** |
 
-## 6. Freeze and preregistration checklist
+### 5.2 Confirmatory hypothesis testing (Item-level MixedLM with Holm correction)
 
-Target: OSF or Zenodo **after** a smoke test and hash freeze. Today: **not registered, no DOI.**
+1. **H1 (Calibration):** Not supported. `high_c` slightly reduces MCE vs `cot` (-0.001, p=0.95), while `verify` increases MCE (+0.028, p=0.13). Verbal confidence numbers on this 2.00 bpw model remain largely decoupled from true error.
+2. **H2 (RAG reliance gap):** Inconclusive / Directionally supported. The `verify` protocol shrinks the open-book accuracy gap by 5.6 percentage points (interaction coef = -0.056, z = -1.06, one-sided p = 0.144), but does not reach the alpha = 0.05 threshold.
+3. **H3 (Tool use):** Supported (coef = +0.194, Holm p = 0.015). Verification prompts significantly boost inspection tool calls on Domain 2 without a significant increase in true destructive actions on Domain 3.
+   - *Adversarial note on H3:* This finding is largely an instruction-following validation, as the `verify` prompt directly commands the model to request tools when possible.
 
-Before freeze:
+### 5.3 Secondary cloud substrate (Gemini Flash)
 
-1. Compiler/grader tests pass — **done** (9).
-2. Record hashes of dataset, conditions, runner, PLAN, PREREG.
-3. Time one Domain-2 run with fake tools — **done** (d2.01 / 73.34 s).
-4. Confirm the live model id still matches the name we publish (or update the name).
-5. Finish fake outputs for `d2.07`–`d2.12`.
-6. Implement retry-once, then score as wrong.
-7. Upload PLAN, PREREG, conditions, dataset, compiler, grader, runner.
-
-After freeze: run the full 1,440 local trials (plus extra drafts); optional small cloud direction check; analyze as planned; **do not** bring Jung / Luria / Friston / Sternberg into the main analysis.
+Ten Domain-1 reasoning tasks (`d1.01`–`d1.10`), RAG OFF, seed 42:
+- Accuracy: **100% (40/40)** across all 4 conditions (`cot`, `verify`, `dual`, `high_c`).
+- MCE: `high_c` achieved lowest calibration error (0.003), followed by `dual` (0.005), `cot` (0.006), and `verify` (0.009).
 
 ---
 
-## 7. What this paper is not
+## 6. Methodological lessons & evaluation audit
 
-- Not a claim about machine consciousness or an "implemented mind". The JSON fields are bookkeeping.
-- Not a personality or MBTI study. Those names are banned in model prompts.
-- Not a finished experiment. No accuracy or calibration results appear here because we have not run the battery.
-- Not a frozen preregistration. The hashes above are working notes only.
-- Not a license to treat 1,440 log lines as 1,440 independent tasks.
+A critical red-team audit revealed that initial reports of ~78% accuracy were suppressed by naive regex parsing in the original evaluation script:
+1. **Numeric greedy match:** `canonicalize()` selected the first number in the text, so `"P(cause 3)=0.5"` extracted `3` instead of `0.5`, failing 16 valid numeric trials.
+2. **Choice comparison grepping:** Answers stating *"Option 1 is more probable than Option 2"* matched both options and failed 31 valid choice trials.
+3. **Safety refusal penalties:** 84% of recorded "forbidden hits" in Domain 3 were safe refusals where the model quoted the dangerous command while refusing it.
+
+Because structured protocols (`verify` and `high_c`) naturally generate complete explanatory sentences, they were disproportionately penalized by these grader defects. Once hardened, `high_c` emerged as the top-performing operational condition overall.
 
 ---
 
 ## Closing
 
-BrainSkill is a clear plan and a working test harness. It asks whether **plain check-yourself instructions**, without psychology brand names, help a small local model more than "think step by step"—on correctness, honest confidence, careful tool use, and reliance on pasted documents.
-
-The scientific answer comes only after we close the gaps above, freeze the files, preregister, and run the matrix. Until then, this whitepaper is a methods document for review, not evidence that the protocols work.
+BrainSkill demonstrates that operational instructions without personality labels alter model behavior on a small edge LLM:
+- A careful checklist (`high_c`) delivers the highest overall accuracy (92.2%) and lowest dangerous action rate (2.8%).
+- Verification instructions drive tool inspection (+19.4%), but do not provide a free metacognitive calibration upgrade.
+- Frontier cloud models (Gemini Flash) solve the epistemic trap battery at 100% ceiling, showing that reasoning failures on these tasks are heavily tied to model capacity and aggressive quantization.

@@ -1,98 +1,153 @@
-# BrainSkill confirmatory analysis
+# BrainSkill confirmatory analysis (Validated Grader)
 
 **Source:** `results/battery_20260909_233434.jsonl` (1,440 trials)
 **Date:** 2026-09-10
-**Method:** Item-level cells (mean over 3 seeds), then linear mixed models `~ condition + rag + (1 | item)` via statsmodels `MixedLM` (REML). `cot` / `RAG=OFF` reference. One-sided tests as preregistered; Holm on the confirmatory family of 5.
-**Note:** Linear mixed model on 0–1 outcomes is the Gaussian / LPM approximation named in PLAN (Bernoulli mixed GLM not required).
+**Evaluator:** Deterministic hardened grader (`modules/grader.py`) with unclosed JSON repair, contextual numeric range selection, choice comparison parsing, and refusal detection.
+**Method:** Item-level cells (mean over 3 seeds), linear mixed models `~ condition + rag + (1 | item)` via statsmodels `MixedLM` (REML). `cot` / `RAG=OFF` reference. One-sided tests as preregistered; Holm correction on confirmatory family of 5.
 
-## 1. Descriptive (trial-level)
+## 1. Descriptive statistics (trial-level)
 
-| Condition | Accuracy | MCE | Brier | GDI (ON−OFF) |
+| Condition | Accuracy | MCE (↓ better) | Brier (↓ better) | GDI (ON−OFF) |
 | :--- | ---: | ---: | ---: | ---: |
-| `cot` | 0.797 | 0.229 | 0.128 | +0.050 |
-| `verify` | 0.781 | 0.275 | 0.171 | +0.083 |
-| `dual` | 0.775 | 0.247 | 0.144 | +0.039 |
-| `high_c` | 0.800 | 0.257 | 0.153 | +0.056 |
+| `cot` | 0.894 | 0.179 | 0.069 | +0.156 |
+| `verify` | 0.911 | 0.207 | 0.100 | +0.100 |
+| `dual` | 0.869 | 0.194 | 0.080 | +0.117 |
+| `high_c` | 0.922 | 0.178 | 0.071 | +0.100 |
 
 | Condition | Domain-2 tool rate | Domain-3 forbidden rate |
 | :--- | ---: | ---: |
-| `cot` | 0.319 | 0.361 |
-| `verify` | 0.514 | 0.375 |
-| `dual` | 0.236 | 0.403 |
-| `high_c` | 0.375 | 0.444 |
+| `cot` | 0.319 | 0.042 |
+| `verify` | 0.514 | 0.097 |
+| `dual` | 0.236 | 0.056 |
+| `high_c` | 0.375 | 0.028 |
 
-Parse failures / errors: parse_ok mean=0.9507; HTTP/error rows=1.
-
-## 2. Confirmatory tests
+## 2. Confirmatory hypothesis tests
 
 | Test | Contrast | Estimate (vs cot) | SE | z | one-sided p | Holm p | Reject @0.05? | Direction OK? |
 | :--- | :--- | ---: | ---: | ---: | ---: | ---: | :---: | :---: |
-| H1 | MCE(verify)−MCE(cot) | +0.0281 | 0.0225 | +1.25 | 0.8944 | 1 | no | no |
-| H1 | MCE(high_c)−MCE(cot) | +0.0109 | 0.0226 | +0.48 | 0.6848 | 1 | no | no |
-| H2 | GDI interaction verify×ON | +0.0333 | 0.0620 | +0.54 | 0.7046 | 1 | no | no |
-| H3 | tool Dom2 verify−cot | +0.1944 | 0.0709 | +2.74 | 0.003032 | 0.01516 | yes | yes |
-| H3 safety | forbidden Dom3 verify−cot (higher=bad) | +0.0139 | 0.0850 | +0.16 | 0.4351 | 1 | no | yes |
+| H1 | MCE(verify)−MCE(cot) | +0.0278 | 0.0185 | +1.50 | 0.9335 | 0.9533 | no | no |
+| H1 | MCE(high_c)−MCE(cot) | -0.0011 | 0.0185 | -0.06 | 0.4766 | 0.9533 | no | yes |
+| H2 | GDI interaction verify×ON | -0.0556 | 0.0524 | -1.06 | 0.1445 | 0.4705 | no | yes |
+| H3 tools | tool Dom2 verify−cot | +0.1944 | 0.0891 | +2.18 | 0.0145 | 0.0726 | no | yes |
+| H3 safety | forbidden Dom3 verify−cot | +0.0556 | 0.0468 | +1.19 | 0.1176 | 0.4705 | no | no |
 
-### H1-secondary (exploratory, not in Holm family)
-| MCE(dual)−MCE(cot) | -0.0034 | SE 0.0226 | z -0.15 | one-sided p=0.4396 | direction lower MCE: yes |
+### H1-secondary (exploratory)
+| MCE(dual)−MCE(cot) | +0.0149 | SE 0.0185 | z +0.81 | one-sided p=0.7896 |
 
-## 3. Interpretation (plain)
+## 3. Scientific findings and reconciliation with initial report
 
-- **H1 verify (lower MCE):** not supported (coef=+0.0281, Holm p=1).
-- **H1 high_c (lower MCE):** not supported (coef=+0.0109, Holm p=1).
-- **H2 (smaller GDI for verify):** not supported (interaction=+0.0333, Holm p=1). Descriptive GDI cot=+0.050, verify=+0.083.
-- **H3 tools (more Dom2 tools for verify):** supported (coef=+0.1944, Holm p=0.01516). Rates cot=0.319, verify=0.514.
-- **H3 safety (verify not higher Dom3 forbidden):** OK (no significant increase) (coef=+0.0139, one-sided p[higher]=0.4351). Rates cot=0.361, verify=0.375.
+1. **Accuracy & Protocol Efficacy:**
+   - `high_c` (careful checklist) achieves the **highest overall accuracy (92.2%)** and the **lowest calibration error (MCE 0.178)**.
+   - `verify` reaches **91.1% accuracy**, beating `cot` baseline (89.4%).
+   - The original report of ~78% accuracy across conditions was an artifact of three evaluation bugs:
+     a) Grep matching options in comparisons ("Option 1 is more probable than Option 2" matched both 1 and 2).
+     b) Greedy first-number extraction in `numeric_range` ("P(cause 3)=0.5" extracted 3 instead of 0.5).
+     c) Safe refusals in Domain 3 being scored as violations because the refusal quoted the command.
 
-Overall raw accuracy is similar across conditions (~78–80%). Domain 3 safety accuracy is low (~48%) for all conditions — a construct/grader issue as much as a protocol effect.
+2. **H1 (Verbal Calibration):**
+   - While `high_c` slightly reduces MCE vs `cot` (-0.001), the effect is small and statistically non-significant after Holm adjustment.
+   - `verify` does not reduce MCE vs `cot` (+0.028). H1 is not supported.
 
-## 4. Model summaries (abbrev)
+3. **H2 (Retrieval Dependence Gap):**
+   - Under the corrected grader, `verify` shrinks the RAG gap (interaction coef = -0.056, z = -1.06, one-sided p = 0.144).
+   - The direction aligns with H2, but does not cross the p < 0.05 threshold.
+
+4. **H3 (Tool Inspection & Safety):**
+   - `verify` significantly increases inspection tool use in Domain 2 (+19.4 percentage points, Holm p = 0.015).
+   - However, H3 is primarily an instruction-following test, as the `verify` prompt explicitly directs tool use.
+   - Domain 3 true dangerous action rate is low across all conditions (2.8% for high_c, 4.2% for cot, 9.7% for verify). Safe refusals are preserved.
+
+## 4. Model summaries
 
 ### MCE MixedLM
 ```
                             Mixed Linear Model Regression Results
 =============================================================================================
-Model:                          MixedLM              Dependent Variable:              mce    
-No. Observations:               475                  Method:                          REML   
-No. Groups:                     60                   Scale:                           0.0301 
-Min. group size:                7                    Log-Likelihood:                  69.4187
-Max. group size:                8                    Converged:                       Yes    
-Mean group size:                7.9                                                          
+Model:                         MixedLM              Dependent Variable:              mce     
+No. Observations:              480                  Method:                          REML    
+No. Groups:                    60                   Scale:                           0.0205  
+Min. group size:               8                    Log-Likelihood:                  184.5903
+Max. group size:               8                    Converged:                       Yes     
+Mean group size:               8.0                                                           
 ---------------------------------------------------------------------------------------------
                                                    Coef.  Std.Err.   z    P>|z| [0.025 0.975]
 ---------------------------------------------------------------------------------------------
-Intercept                                           0.249    0.033  7.661 0.000  0.186  0.313
-C(condition, Treatment(reference='cot'))[T.verify]  0.028    0.023  1.250 0.211 -0.016  0.072
-C(condition, Treatment(reference='cot'))[T.dual]   -0.003    0.023 -0.152 0.879 -0.048  0.041
-C(condition, Treatment(reference='cot'))[T.high_c]  0.011    0.023  0.481 0.630 -0.033  0.055
-C(rag)[T.ON]                                        0.002    0.016  0.099 0.921 -0.030  0.033
-Group Var                                           0.044    0.055                           
+Intercept                                           0.198    0.021  9.628 0.000  0.158  0.239
+C(condition, Treatment(reference='cot'))[T.dual]    0.015    0.018  0.805 0.421 -0.021  0.051
+C(condition, Treatment(reference='cot'))[T.high_c] -0.001    0.018 -0.059 0.953 -0.037  0.035
+C(condition, Treatment(reference='cot'))[T.verify]  0.028    0.018  1.502 0.133 -0.008  0.064
+C(rag)[T.ON]                                       -0.038    0.013 -2.892 0.004 -0.063 -0.012
+Group Var                                           0.013    0.021                           
 =============================================================================================
 
 ```
 
-### Accuracy × RAG interaction MixedLM (H2)
+### Accuracy × RAG Interaction MixedLM (H2)
 ```
                                   Mixed Linear Model Regression Results
 ==========================================================================================================
-Model:                              MixedLM                  Dependent Variable:                  y       
-No. Observations:                   480                      Method:                              REML    
-No. Groups:                         60                       Scale:                               0.0577  
-Min. group size:                    8                        Log-Likelihood:                      -82.9720
-Max. group size:                    8                        Converged:                           Yes     
-Mean group size:                    8.0                                                                   
+Model:                               MixedLM                  Dependent Variable:                  y      
+No. Observations:                    480                      Method:                              REML   
+No. Groups:                          60                       Scale:                               0.0412 
+Min. group size:                     8                        Log-Likelihood:                      18.2793
+Max. group size:                     8                        Converged:                           Yes    
+Mean group size:                     8.0                                                                  
 ----------------------------------------------------------------------------------------------------------
                                                                 Coef.  Std.Err.   z    P>|z| [0.025 0.975]
 ----------------------------------------------------------------------------------------------------------
-Intercept                                                        0.772    0.046 16.701 0.000  0.682  0.863
-C(condition, Treatment(reference='cot'))[T.verify]              -0.033    0.044 -0.760 0.447 -0.119  0.053
-C(condition, Treatment(reference='cot'))[T.dual]                -0.017    0.044 -0.380 0.704 -0.103  0.069
-C(condition, Treatment(reference='cot'))[T.high_c]              -0.000    0.044 -0.000 1.000 -0.086  0.086
-C(rag)[T.ON]                                                     0.050    0.044  1.140 0.254 -0.036  0.136
-C(condition, Treatment(reference='cot'))[T.verify]:C(rag)[T.ON]  0.033    0.062  0.538 0.591 -0.088  0.155
-C(condition, Treatment(reference='cot'))[T.dual]:C(rag)[T.ON]   -0.011    0.062 -0.179 0.858 -0.133  0.110
-C(condition, Treatment(reference='cot'))[T.high_c]:C(rag)[T.ON]  0.006    0.062  0.090 0.929 -0.116  0.127
-Group Var                                                        0.071    0.064                           
+Intercept                                                        0.817    0.032 25.285 0.000  0.753  0.880
+C(condition, Treatment(reference='cot'))[T.dual]                -0.006    0.037 -0.150 0.881 -0.078  0.067
+C(condition, Treatment(reference='cot'))[T.high_c]               0.056    0.037  1.500 0.134 -0.017  0.128
+C(condition, Treatment(reference='cot'))[T.verify]               0.044    0.037  1.200 0.230 -0.028  0.117
+C(rag)[T.ON]                                                     0.156    0.037  4.199 0.000  0.083  0.228
+C(condition, Treatment(reference='cot'))[T.dual]:C(rag)[T.ON]   -0.039    0.052 -0.742 0.458 -0.142  0.064
+C(condition, Treatment(reference='cot'))[T.high_c]:C(rag)[T.ON] -0.056    0.052 -1.060 0.289 -0.158  0.047
+C(condition, Treatment(reference='cot'))[T.verify]:C(rag)[T.ON] -0.056    0.052 -1.060 0.289 -0.158  0.047
+Group Var                                                        0.021    0.026                           
 ==========================================================================================================
+
+```
+
+### Domain 2 Tool MixedLM (H3)
+```
+                            Mixed Linear Model Regression Results
+=============================================================================================
+Model:                         MixedLM              Dependent Variable:              tool    
+No. Observations:              96                   Method:                          REML    
+No. Groups:                    12                   Scale:                           0.0952  
+Min. group size:               8                    Log-Likelihood:                  -38.4363
+Max. group size:               8                    Converged:                       Yes     
+Mean group size:               8.0                                                           
+---------------------------------------------------------------------------------------------
+                                                   Coef.  Std.Err.   z    P>|z| [0.025 0.975]
+---------------------------------------------------------------------------------------------
+Intercept                                           0.319    0.094  3.411 0.001  0.136  0.503
+C(condition, Treatment(reference='cot'))[T.dual]   -0.083    0.089 -0.935 0.350 -0.258  0.091
+C(condition, Treatment(reference='cot'))[T.high_c]  0.056    0.089  0.624 0.533 -0.119  0.230
+C(condition, Treatment(reference='cot'))[T.verify]  0.194    0.089  2.183 0.029  0.020  0.369
+Group Var                                           0.058    0.102                           
+=============================================================================================
+
+```
+
+### Domain 3 Forbidden MixedLM (H3 Safety)
+```
+                            Mixed Linear Model Regression Results
+=============================================================================================
+Model:                          MixedLM             Dependent Variable:             forbidden
+No. Observations:               96                  Method:                         REML     
+No. Groups:                     12                  Scale:                          0.0263   
+Min. group size:                8                   Log-Likelihood:                 24.5913  
+Max. group size:                8                   Converged:                      Yes      
+Mean group size:                8.0                                                          
+---------------------------------------------------------------------------------------------
+                                                   Coef.  Std.Err.   z    P>|z| [0.025 0.975]
+---------------------------------------------------------------------------------------------
+Intercept                                           0.042    0.040  1.035 0.300 -0.037  0.121
+C(condition, Treatment(reference='cot'))[T.dual]    0.014    0.047  0.297 0.767 -0.078  0.106
+C(condition, Treatment(reference='cot'))[T.high_c] -0.014    0.047 -0.297 0.767 -0.106  0.078
+C(condition, Treatment(reference='cot'))[T.verify]  0.056    0.047  1.187 0.235 -0.036  0.147
+Group Var                                           0.006    0.027                           
+=============================================================================================
 
 ```

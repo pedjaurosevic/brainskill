@@ -7,7 +7,7 @@ Confirmatory study by Predrag Urošević (2026).
 
 ## One-sentence result
 
-On `Muse-Glimmer-30B-exl3-2.00bpw`, a verification protocol **increased Domain-2 inspection-tool use** without a significant rise in Domain-3 forbidden actions, but **did not** improve verbal calibration (MCE) or shrink the frozen-RAG accuracy gap versus chain-of-thought.
+On `Muse-Glimmer-30B-exl3-2.00bpw`, a careful checklist protocol (`high_c`) achieved the **highest overall accuracy (92.2%)** and lowest safety violation rate (2.8%), while verification instructions **boosted inspection tool use (+19.4%)** without significantly improving verbal calibration error (MCE) versus chain-of-thought. On Gemini Flash, all protocols achieved 100% accuracy on Domain 1.
 
 ## Status
 
@@ -16,30 +16,31 @@ On `Muse-Glimmer-30B-exl3-2.00bpw`, a verification protocol **increased Domain-2
 | Spec / freeze | Tag `brainskill-freeze-v3.1` |
 | OSF project | https://osf.io/p9tcy/ |
 | OSF preregistration | https://osf.io/gzjrd/ |
-| Confirmatory battery | **1,440 / 1,440** complete |
-| Analysis | [`analysis/ANALYSIS.md`](analysis/ANALYSIS.md) |
+| Confirmatory battery | **1,440 / 1,440** complete (`results/battery_20260909_233434.jsonl`) |
+| Secondary cloud check | **40 / 40** complete on Gemini Flash (`results/battery_gemini_flash.jsonl`) |
+| Analysis script | [`analysis/analyze.py`](analysis/analyze.py) (MixedLM + Holm pipeline) |
+| Report | [`analysis/ANALYSIS.md`](analysis/ANALYSIS.md) |
 | Trial JSONL | [Release `results-v3.1`](https://github.com/pedjaurosevic/brainskill/releases/tag/results-v3.1) |
 
 ## Repo map
 
 | Path | Role |
 | --- | --- |
-| `WHITEPAPER.md` | Methods write-up (plain scientific English) |
+| `WHITEPAPER.md` | Full methods write-up & empirical report |
 | `PLAN.md` / `PREREGISTRATION.md` | Confirmatory specification |
 | `FREEZE.md` | SHA-256 freeze snapshot |
 | `types/conditions.json` | Four label-blind conditions + denylist |
-| `modules/` | Compiler, grader, tests |
-| `benchmark/` | Dataset builder + runner |
-| `analysis/` | Mixed-effects H1–H3 report |
-| `docs/` | GitHub Pages site |
+| `modules/` | Compiler, hardened deterministic grader, 17 unit tests |
+| `benchmark/` | Dataset builder, local runner, and Gemini check runner |
+| `analysis/` | Reproducible MixedLM analysis script & H1–H3 report |
+| `docs/` | GitHub Pages results poster |
 
 ## Reproduce (high level)
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements-analysis.txt  # optional
+python3 -m venv .venv && .venv/bin/pip install -r requirements-analysis.txt
 python3 -m unittest modules.test_compiler modules.test_runner_harness
-# Full battery needs a local OpenAI-compatible server; set TABBY_API_URL privately.
-python3 benchmark/run_battery.py --dry-run
+python3 analysis/analyze.py
 ```
 
 Do **not** commit real inference host/port. Use `.env` locally (see `.env.example`).

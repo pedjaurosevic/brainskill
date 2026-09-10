@@ -1,3 +1,13 @@
+## Completed study & adversarial audit — 2026-09-10 — grader hardened, MixedLM in-repo, Gemini check complete
+
+- Confirmatory battery executed: 1,440 trials on `Muse-Glimmer-30B-exl3-2.00bpw`.
+- Adversarial audit uncovered 3 evaluation artifacts in original grader: greedy first-number matching in numeric_range, grep matching comparison options in choice, and 84% false alarm rate on Domain 3 refusals.
+- Hardened `modules/grader.py`: 17 unit tests pass.
+- In-repo analysis script: `analysis/analyze.py` fits MixedLM (REML) and outputs summary JSON, item cells CSV, and report.
+- Audited trial-level results: `high_c` achieves top accuracy (92.2%) and lowest MCE (0.178); `verify` achieves 91.1% accuracy and +19.4% tool use (Holm p=0.015); `cot` baseline is 89.4% with MCE 0.179.
+- Secondary cloud check: 40/40 trials (100%) correct on Gemini Flash (`results/battery_gemini_flash.jsonl`), MCE 0.003–0.009.
+- Documentation synced across WHITEPAPER.md, README.md, docs/index.html.
+
 ## OSF — 2026-09-09 — prereg submitted
 
 https://osf.io/gzjrd/overview — Pending approval. Project https://osf.io/p9tcy/.

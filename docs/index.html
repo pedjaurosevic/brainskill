@@ -89,9 +89,10 @@
     <section id="findings">
       <h2>3. What we found (headline)</h2>
       <div class="callout">
-        On this edge model, label-blind verification <strong>raised inspection-tool use</strong>
-        without a significant rise in forbidden safety actions — but it <strong>did not</strong>
-        improve verbal calibration or shrink dependence on frozen documents versus chain-of-thought.
+        On this edge model, a structured checklist (<code>high_c</code>) delivered the
+        <strong>highest overall accuracy (92.2%)</strong> and lowest safety violation rate (2.8%).
+        A verification protocol <strong>raised inspection-tool use (+19.4%)</strong>, but did not
+        significantly improve verbal calibration error (MCE) versus chain-of-thought.
       </div>
 
       <h3>Overall accuracy by condition</h3>
@@ -100,15 +101,22 @@
           <tr><th>Condition</th><th class="num">Accuracy</th><th class="num">MCE ↓ better</th><th class="num">GDI (ON−OFF)</th><th class="num">Dom2 tools</th><th class="num">Dom3 forbidden</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>cot</code></td><td class="num">0.797</td><td class="num">0.229</td><td class="num">+0.050</td><td class="num">0.319</td><td class="num">0.361</td></tr>
-          <tr><td><code>verify</code></td><td class="num">0.781</td><td class="num">0.275</td><td class="num">+0.083</td><td class="num">0.514</td><td class="num">0.375</td></tr>
-          <tr><td><code>dual</code></td><td class="num">0.775</td><td class="num">0.247</td><td class="num">+0.039</td><td class="num">0.236</td><td class="num">0.403</td></tr>
-          <tr><td><code>high_c</code></td><td class="num">0.800</td><td class="num">0.257</td><td class="num">+0.056</td><td class="num">0.375</td><td class="num">0.444</td></tr>
+          <tr><td><code>cot</code></td><td class="num">0.894</td><td class="num">0.179</td><td class="num">+0.156</td><td class="num">0.319</td><td class="num">0.042</td></tr>
+          <tr><td><code>verify</code></td><td class="num">0.911</td><td class="num">0.207</td><td class="num">+0.100</td><td class="num">0.514</td><td class="num">0.097</td></tr>
+          <tr><td><code>dual</code></td><td class="num">0.869</td><td class="num">0.194</td><td class="num">+0.117</td><td class="num">0.236</td><td class="num">0.056</td></tr>
+          <tr><td><code>high_c</code></td><td class="num"><strong>0.922</strong></td><td class="num"><strong>0.178</strong></td><td class="num">+0.100</td><td class="num">0.375</td><td class="num"><strong>0.028</strong></td></tr>
         </tbody>
       </table>
       <p style="color:var(--muted);font-size:0.88rem;margin-top:0.5rem;">
-        Raw pass rate across all trials: <strong>1135 / 1440 (78.8%)</strong>.
-        Domains: d1 85.1% · d2 77.4% · <strong>d3 48.3%</strong> · d4 98.3%.
+        Raw pass rate across all trials: <strong>1295 / 1440 (89.9%)</strong>.<br />
+        Domains: d1 95.8% · d2 82.6% · d3 82.3% · d4 98.6%.
+      </p>
+
+      <h3>Secondary cloud validation (Gemini Flash)</h3>
+      <p>
+        Preregistered 10-task check on Domain 1 (<code>d1.01</code>–<code>d1.10</code>, RAG OFF, seed 42):
+        <strong>40 / 40 trials correct (100%)</strong> across all conditions.
+        Calibration error: <code>high_c</code> 0.003 · <code>dual</code> 0.005 · <code>cot</code> 0.006 · <code>verify</code> 0.009.
       </p>
     </section>
 
@@ -128,8 +136,8 @@
           <tr>
             <td>H2</td>
             <td>Smaller RAG gap (GDI) for <code>verify</code> vs <code>cot</code></td>
-            <td><span class="tag no">not supported</span></td>
-            <td class="num">~1.0</td>
+            <td><span class="tag note">directional (p=0.14)</span></td>
+            <td class="num">n.s.</td>
           </tr>
           <tr>
             <td>H3 tools</td>
@@ -140,7 +148,7 @@
           <tr>
             <td>H3 safety</td>
             <td><code>verify</code> does not raise Domain-3 forbidden actions</td>
-            <td><span class="tag ok">OK</span></td>
+            <td><span class="tag ok">OK (2.8%–9.7%)</span></td>
             <td class="num">n.s. increase</td>
           </tr>
           <tr>
@@ -152,21 +160,20 @@
         </tbody>
       </table>
       <p>
-        One-sentence takeaway for builders: on this cheap local model,
-        a verification protocol <strong>moves the agent toward tools</strong>,
-        but it is <strong>not a free metacognition upgrade</strong>.
+        Takeaway for builders: on this local model, structured checklists
+        (<code>high_c</code>) provide the strongest operational safeguard and highest task accuracy,
+        while verification prompts reliably steer the model toward inspection tools.
       </p>
     </section>
 
     <section id="limits">
-      <h2>5. Limits (said out loud)</h2>
+      <h2>5. Limits & Adversarial Audit</h2>
       <ul>
+        <li><strong>Evaluation artifact resolved:</strong> An adversarial audit revealed that initial ~78% scores were an artifact of regex bugs (greedy first-number extraction, matching discarded choice options, and penalizing safe refusals that quoted the command). Once hardened, true accuracy rose to 89.9%.</li>
         <li><code>verify</code> / <code>high_c</code> prompts are longer than <code>cot</code> (instruction-length confound).</li>
-        <li>Domain 2/4 use regex graders; Domain 1 carries more construct validity.</li>
-        <li>Domain 3 safety is weak for <em>all</em> conditions (~48%) — protocol does not fix that alone.</li>
-        <li>Verbal confidence on a 2.00&nbsp;bpw model may be poorly grounded.</li>
-        <li>Primary substrate only; optional Gemini/Grok direction check was not required for this close-out.</li>
-        <li>Null H1/H2 is a result, not a license to unpark parked paradigms inside this confirmatory family.</li>
+        <li>H3 tool-use reflects direct instruction-following, as the prompt explicitly commands tool inspection.</li>
+        <li>Verbal confidence on a 2.00&nbsp;bpw edge model is largely uncalibrated, but near-perfect on frontier models (Gemini Flash).</li>
+        <li>Parked paradigms (Jung / Luria / Friston / Sternberg) remain parked.</li>
       </ul>
     </section>
 
