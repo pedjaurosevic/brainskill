@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BrainSkill — label-blind protocols vs chain-of-thought</title>
+  <meta name="description" content="Confirmatory study: do label-blind verification protocols beat chain-of-thought on an edge LLM? Preregistered, frozen, fully run." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Confirmatory study · completed</p>
+      <h1>Can plain work instructions beat “think step by step” on a small local model?</h1>
+      <p class="lede">
+        BrainSkill tests <strong>label-blind operational protocols</strong> against ordinary chain-of-thought
+        on a heavily quantized local LLM — without telling the model to “act like” a personality type or psychologist.
+      </p>
+      <div class="meta">
+        <span class="pill">Author: Predrag Urošević</span>
+        <span class="pill">1,440 scored trials</span>
+        <span class="pill">Freeze tag: brainskill-freeze-v3.1</span>
+        <span class="pill">Model: Muse-Glimmer-30B-exl3-2.00bpw</span>
+      </div>
+    </header>
+
+    <nav>
+      <a href="#question">Question</a>
+      <a href="#design">Design</a>
+      <a href="#findings">Findings</a>
+      <a href="#hypotheses">Hypotheses</a>
+      <a href="#limits">Limits</a>
+      <a href="#links">Links</a>
+    </nav>
+
+    <section id="question">
+      <h2>1. What we asked</h2>
+      <p>
+        Many prompts say “you are an INTJ” or “think like Kahneman.” That mostly measures
+        <em>stereotype recall</em>. We asked something narrower:
+      </p>
+      <div class="callout">
+        <strong>If the model only sees concrete steps</strong> — state a claim, name what would refute it,
+        use a tool when that helps, update, set confidence; or use a careful checklist —
+        does that change accuracy, verbal calibration, tool use, and dependence on pasted documents,
+        compared with plain “think step by step”?
+      </div>
+      <p>
+        Jung / Luria / Friston / Sternberg ideas stayed <strong>parked</strong>. This run is only four
+        operational conditions, not a personality study and not a consciousness claim.
+      </p>
+    </section>
+
+    <section id="design">
+      <h2>2. How we tested it</h2>
+      <div class="grid">
+        <div class="stat"><div class="k">Matrix</div><div class="v">4 × 2 × 60 × 3</div><div class="s">conditions · RAG · items · seeds</div></div>
+        <div class="stat"><div class="k">Scored trials</div><div class="v">1,440</div><div class="s">item = generalization unit</div></div>
+        <div class="stat"><div class="k">Grading</div><div class="v">Deterministic</div><div class="s">no LLM-as-judge</div></div>
+        <div class="stat"><div class="k">Blinding</div><div class="v">Denylist</div><div class="s">no INTJ / Kahneman / System&nbsp;1 in prompts</div></div>
+      </div>
+
+      <h3>Conditions (what the model saw)</h3>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">cot</td><td>Baseline: think step by step.</td></tr>
+          <tr><td class="mono">verify</td><td>Claim → falsifier → tool if possible → update → confidence.</td></tr>
+          <tr><td class="mono">dual</td><td>Two drafts; on disagreement, escalate to verification (runner gate).</td></tr>
+          <tr><td class="mono">high_c</td><td>Checklist, conservative action, no guessing.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Modules</h3>
+      <ul>
+        <li><strong>RAG ON/OFF</strong> with frozen packets (1 true + 2 distractors) — no live search index.</li>
+        <li><strong>JSON response contract</strong> with confidence in [0, 1], weakest premise, falsification check.</li>
+        <li><strong>Battery:</strong> 24 epistemic traps · 12 Linux debug · 12 safety · 12 short sieves.</li>
+      </ul>
+      <p>
+        Preregistered before the full run. Tree frozen under tag
+        <code>brainskill-freeze-v3.1</code>. Analysis: item-level cells (mean over seeds),
+        linear mixed models with random intercept for item, <code>cot</code> as reference, Holm correction.
+      </p>
+    </section>
+
+    <section id="findings">
+      <h2>3. What we found (headline)</h2>
+      <div class="callout">
+        On this edge model, label-blind verification <strong>raised inspection-tool use</strong>
+        without a significant rise in forbidden safety actions — but it <strong>did not</strong>
+        improve verbal calibration or shrink dependence on frozen documents versus chain-of-thought.
+      </div>
+
+      <h3>Overall accuracy by condition</h3>
+      <table>
+        <thead>
+          <tr><th>Condition</th><th class="num">Accuracy</th><th class="num">MCE ↓ better</th><th class="num">GDI (ON−OFF)</th><th class="num">Dom2 tools</th><th class="num">Dom3 forbidden</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>cot</code></td><td class="num">0.797</td><td class="num">0.229</td><td class="num">+0.050</td><td class="num">0.319</td><td class="num">0.361</td></tr>
+          <tr><td><code>verify</code></td><td class="num">0.781</td><td class="num">0.275</td><td class="num">+0.083</td><td class="num">0.514</td><td class="num">0.375</td></tr>
+          <tr><td><code>dual</code></td><td class="num">0.775</td><td class="num">0.247</td><td class="num">+0.039</td><td class="num">0.236</td><td class="num">0.403</td></tr>
+          <tr><td><code>high_c</code></td><td class="num">0.800</td><td class="num">0.257</td><td class="num">+0.056</td><td class="num">0.375</td><td class="num">0.444</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--muted);font-size:0.88rem;margin-top:0.5rem;">
+        Raw pass rate across all trials: <strong>1135 / 1440 (78.8%)</strong>.
+        Domains: d1 85.1% · d2 77.4% · <strong>d3 48.3%</strong> · d4 98.3%.
+      </p>
+    </section>
+
+    <section id="hypotheses">
+      <h2>4. Preregistered hypotheses</h2>
+      <table>
+        <thead>
+          <tr><th>Hypothesis</th><th>Claim</th><th>Result</th><th class="num">Holm p</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>H1</td>
+            <td>Lower MCE for <code>verify</code> / <code>high_c</code> vs <code>cot</code></td>
+            <td><span class="tag no">not supported</span></td>
+            <td class="num">~1.0</td>
+          </tr>
+          <tr>
+            <td>H2</td>
+            <td>Smaller RAG gap (GDI) for <code>verify</code> vs <code>cot</code></td>
+            <td><span class="tag no">not supported</span></td>
+            <td class="num">~1.0</td>
+          </tr>
+          <tr>
+            <td>H3 tools</td>
+            <td>Higher Domain-2 inspection-tool rate for <code>verify</code></td>
+            <td><span class="tag ok">supported</span></td>
+            <td class="num">0.015</td>
+          </tr>
+          <tr>
+            <td>H3 safety</td>
+            <td><code>verify</code> does not raise Domain-3 forbidden actions</td>
+            <td><span class="tag ok">OK</span></td>
+            <td class="num">n.s. increase</td>
+          </tr>
+          <tr>
+            <td>H1-sec.</td>
+            <td>Lower MCE for <code>dual</code> vs <code>cot</code> (exploratory)</td>
+            <td><span class="tag note">n.s.</span></td>
+            <td class="num">—</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        One-sentence takeaway for builders: on this cheap local model,
+        a verification protocol <strong>moves the agent toward tools</strong>,
+        but it is <strong>not a free metacognition upgrade</strong>.
+      </p>
+    </section>
+
+    <section id="limits">
+      <h2>5. Limits (said out loud)</h2>
+      <ul>
+        <li><code>verify</code> / <code>high_c</code> prompts are longer than <code>cot</code> (instruction-length confound).</li>
+        <li>Domain 2/4 use regex graders; Domain 1 carries more construct validity.</li>
+        <li>Domain 3 safety is weak for <em>all</em> conditions (~48%) — protocol does not fix that alone.</li>
+        <li>Verbal confidence on a 2.00&nbsp;bpw model may be poorly grounded.</li>
+        <li>Primary substrate only; optional Gemini/Grok direction check was not required for this close-out.</li>
+        <li>Null H1/H2 is a result, not a license to unpark parked paradigms inside this confirmatory family.</li>
+      </ul>
+    </section>
+
+    <section id="links">
+      <h2>6. Open materials</h2>
+      <ul>
+        <li><a href="https://github.com/pedjaurosevic/brainskill">GitHub repository</a></li>
+        <li><a href="https://github.com/pedjaurosevic/brainskill/tree/brainskill-freeze-v3.1">Freeze tag <code>brainskill-freeze-v3.1</code></a></li>
+        <li><a href="https://github.com/pedjaurosevic/brainskill/blob/main/WHITEPAPER.md">Whitepaper</a> ·
+            <a href="https://github.com/pedjaurosevic/brainskill/blob/main/analysis/ANALYSIS.md">Full analysis</a> ·
+            <a href="https://github.com/pedjaurosevic/brainskill/blob/main/FREEZE.md">FREEZE.md</a></li>
+        <li>OSF project: <a href="https://osf.io/p9tcy/">osf.io/p9tcy</a> ·
+            Preregistration: <a href="https://osf.io/gzjrd/">osf.io/gzjrd</a> (Pending approval as of submission)</li>
+        <li>Trial log release: <a href="https://github.com/pedjaurosevic/brainskill/releases/tag/results-v3.1">results-v3.1</a> (full JSONL)</li>
+      </ul>
+    </section>
+
+    <footer>
+      BrainSkill · Predrag Urošević · 2026.
+      Public write-up of a completed confirmatory run. Not medical, legal, or deployment advice.
+      Inference host/port intentionally omitted.
+    </footer>
+  </div>
+</body>
+</html>

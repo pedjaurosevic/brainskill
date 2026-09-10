@@ -14,3 +14,4 @@ benchmark_results*.jsonl
 .mypy_cache/
 .ruff_cache/
 .venv/
+results/
