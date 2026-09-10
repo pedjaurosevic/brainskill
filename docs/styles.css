@@ -127,6 +127,17 @@ footer {
   font-size: 0.85rem;
 }
 code, .mono { font-family: var(--mono); font-size: 0.88em; }
+blockquote {
+  border-left: 3px solid var(--accent2);
+  background: #121821;
+  padding: 0.75rem 1rem;
+  border-radius: 0 10px 10px 0;
+  margin: 0.85rem 0;
+  color: var(--text);
+  font-style: italic;
+}
+ol { margin: 0.4rem 0 0.2rem 1.3rem; padding: 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 @media (max-width: 600px) {
   .wrap { padding: 1.25rem 0.9rem 3rem; }
   header { padding: 1.25rem 1rem; }

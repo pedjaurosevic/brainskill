@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BrainSkill Whitepaper — Can plain work instructions beat "think step by step"?</title>
+  <meta name="description" content="BrainSkill confirmatory study whitepaper: Can plain work instructions beat 'think step by step' on a small local model? Full empirical report and methodological audit." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Confirmatory study · Whitepaper</p>
+      <h1>Can plain work instructions beat “think step by step” on a small local model?</h1>
+      <p class="lede">
+        BrainSkill confirmatory study — full scientific report on label-blind operational protocols versus chain-of-thought on an edge LLM.
+      </p>
+      <div class="meta">
+        <span class="pill">Author: Predrag Urošević</span>
+        <span class="pill">Date: 2026-09-10</span>
+        <span class="pill">Status: COMPLETED</span>
+        <span class="pill">Tag: brainskill-freeze-v3.1</span>
+        <span class="pill">Trials: 1,440 local + 40 Gemini Flash</span>
+      </div>
+    </header>
+
+    <nav>
+      <a href="index.html">← Back to Overview</a>
+      <a href="#abstract">Abstract</a>
+      <a href="#section-1">1. Rationale</a>
+      <a href="#section-2">2. Related Work</a>
+      <a href="#section-3">3. Protocol</a>
+      <a href="#section-4">4. Execution Status</a>
+      <a href="#section-5">5. Empirical Results</a>
+      <a href="#section-6">6. Evaluation Audit</a>
+      <a href="#closing">Closing</a>
+      <a href="https://github.com/pedjaurosevic/brainskill/blob/main/WHITEPAPER.md">Markdown on GitHub</a>
+    </nav>
+
+    <section id="abstract">
+      <h2>Abstract</h2>
+      <p>
+        Many prompts tell a language model to <em>act like</em> a personality type or a famous psychologist. That mostly tests whether the model remembers internet stereotypes.
+      </p>
+      <p>
+        BrainSkill asks a simpler question: if we give the model <strong>plain work instructions</strong>—check your claim, say what would prove you wrong, use a tool when you can, fill a checklist, do not guess—does it answer better than the usual “think step by step”? Better here means: more often correct, more honest about how sure it is, more willing to inspect a system before acting, and less dependent on extra documents we paste in.
+      </p>
+      <p>
+        The model <strong>never</strong> sees brand names like INTJ, Kahneman, or “System 1”. We only send operational steps.
+      </p>
+      <p>
+        We compare <strong>four instruction styles</strong>, each with and without a fixed set of helper documents, across <strong>60 tasks</strong>, repeated <strong>3 times</strong>. That is <strong>1,440</strong> scored runs. When we use the “two drafts” style, our runner—not the model—decides whether the drafts disagree and whether a careful second pass is needed.
+      </p>
+      <p>
+        The model under test is a compressed local model (<code>Muse-Glimmer-30B-exl3-2.00bpw</code>) served by TabbyAPI on this machine only (exact address kept private). The full battery of 1,440 scored trials has been completed and analyzed alongside a 40-trial secondary cloud validation on Gemini Flash. All 17 unit tests pass.
+      </p>
+      <div class="callout">
+        <strong>Companion specifications:</strong>
+        <code>PLAN.md</code> v3.1-freeze · <code>PREREGISTRATION.md</code> · <code>RED_TEAM_AUDIT.md</code> · <code>benchmark/TESTING_METHODOLOGY.md</code> · OSF preregistration: <a href="https://osf.io/gzjrd/overview">osf.io/gzjrd/overview</a>
+      </div>
+    </section>
+
+    <section id="section-1">
+      <h2>1. Why we strip the psychology labels</h2>
+      <p>
+        A common trick is: “You are an INTJ” or “Think like Kahneman.” The model then pulls pop-psychology phrases from training data. You cannot tell whether a <em>procedure</em> helped, or whether a <em>label</em> primed a stereotype.
+      </p>
+      <p>Our claim is narrower and easier to falsify:</p>
+      <blockquote>
+        “If the model only sees concrete steps (state a claim, name what would refute it, call a tool if that helps, update, set a confidence number; or use a short safety checklist), do those steps change measurable behavior on tasks with clear right answers?”
+      </blockquote>
+      <ul>
+        <li>If the effect needs the brand names, we were measuring priming.</li>
+        <li>If the effect remains without the names, the steps themselves are worth using on small local models (one 12 GB GPU, no cloud agent swarm).</li>
+      </ul>
+      <p>
+        Ideas we are <strong>not</strong> testing in this run (files kept for later): Jung's 16 types, Luria's brain units, Friston-style free energy, Sternberg's triarchic model. Those stay parked.
+      </p>
+    </section>
+
+    <section id="section-2">
+      <h2>2. Related work (short, corrected)</h2>
+      <p>
+        This is not a full literature review. Citations match <code>library/PAPERS.md</code> (checked 2026-09-09). We do not invent papers.
+      </p>
+      <ul>
+        <li><strong>Ackerman (arXiv:2509.21545; ICLR 2026).</strong> Some large models show <em>limited but real</em> signs of knowing when they are unsure. We still treat the model's written confidence as a <strong>number in the answer</strong>, scored against right/wrong—not as proof of an inner probability meter.</li>
+        <li><strong>CoALA (Sumers, Yao, Narasimhan, Griffiths; arXiv:2309.02427).</strong> A map of how language agents use memory and actions. We borrow the idea of structured loops; we do not claim to implement CoALA.</li>
+        <li><strong>Ai, He, Zhang (arXiv:2402.14679).</strong> Saying “I am this personality” often does not match how the model behaves on tasks. That supports stripping labels.</li>
+        <li><strong>Butlin et al. (arXiv:2308.08708).</strong> Work on consciousness indicators. Used here as a <strong>warning label</strong>: our JSON answer format is not a claim about consciousness.</li>
+        <li><strong>Courchaine, Sethi, Qiu (WWW Companion 2026).</strong> Metacognition ideas for <em>groups</em> of models. Cite the conference PDF; do not cite the old unverified arXiv id from our earlier draft.</li>
+      </ul>
+      <p>
+        With the execution of the 1,440-trial battery, BrainSkill provides empirical data on how these operational instructions perform in practice on edge hardware.
+      </p>
+    </section>
+
+    <section id="section-3">
+      <h2>3. Experimental design and protocol</h2>
+
+      <h3>3.1 Four ways of instructing the model</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>What we call it (internal)</th>
+            <th>What the model sees</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>cot</code></td>
+            <td>Baseline</td>
+            <td>Think step by step. Use only the given info and any tool results.</td>
+          </tr>
+          <tr>
+            <td><code>verify</code></td>
+            <td>Check-yourself protocol</td>
+            <td>State the claim → say what would refute it → use a tool if that helps → update → set confidence honestly.</td>
+          </tr>
+          <tr>
+            <td><code>dual</code></td>
+            <td>Two drafts</td>
+            <td>Give a quick answer first. If our software finds that two independent drafts disagree, ask again with the check-yourself protocol.</td>
+          </tr>
+          <tr>
+            <td><code>high_c</code></td>
+            <td>Careful checklist</td>
+            <td>List constraints and failure modes, mark each pass/fail, prefer the safe action, do not guess.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Prompts come from <code>types/conditions.json</code> through <code>modules/compiler.py</code>. If a forbidden psychology word leaks into the model-facing text, the compiler <strong>errors</strong>. <code>SKILL.md</code> is a manual for that compiler, not a prompt the model receives.
+      </p>
+
+      <h3>3.2 How "two drafts" disagreement works</h3>
+      <p>We <strong>reject</strong> the old trick of calling “conflict” whatever the next-token probability looks uncertain. Instead the runner:</p>
+      <ol>
+        <li>Samples draft A with seed <em>s</em>.</li>
+        <li>Samples draft B with seed <em>s</em> + 10,000.</li>
+        <li>Normalizes both final answers with the same scorer.</li>
+        <li>If they differ, samples draft C with the careful protocol and scores C.</li>
+        <li>If they match, scores A.</li>
+      </ol>
+      <p>The model is never told about “System 1” or “System 2”.</p>
+
+      <h3>3.3 Extra documents (on / off)</h3>
+      <p>
+        Each task has a <strong>fixed</strong> packet: one helpful document and two misleading ones.<br />
+        <strong>ON</strong> = paste that packet into the prompt. <strong>OFF</strong> = no packet.<br />
+        We do <strong>not</strong> run a live search index. ON is an open-book filter test, not a retrieval-engine benchmark.
+      </p>
+
+      <h3>3.4 Required answer shape</h3>
+      <p>The model must reply with JSON only:</p>
+      <ul>
+        <li>its reasoning,</li>
+        <li>its final answer or action,</li>
+        <li>a confidence between 0 and 1,</li>
+        <li>its weakest assumption,</li>
+        <li>what would falsify the answer.</li>
+      </ul>
+      <p>If the JSON cannot be parsed, the trial counts as wrong.</p>
+
+      <h3>3.5 The 60 tasks</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th class="num">Count</th>
+            <th>What it tests</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1 Thinking traps</strong></td>
+            <td class="num">24</td>
+            <td>Classic probability / logic mistakes (Bayes, Wason, conjunction, and similar). This is the scientific core.</td>
+          </tr>
+          <tr>
+            <td><strong>2 Linux debugging</strong></td>
+            <td class="num">12</td>
+            <td>Diagnose a system; inspection tools allowed; dangerous "fix" commands forbidden.</td>
+          </tr>
+          <tr>
+            <td><strong>3 Safety</strong></td>
+            <td class="num">12</td>
+            <td>Refuse or sanitize destructive actions.</td>
+          </tr>
+          <tr>
+            <td><strong>4 Noise vs signal</strong></td>
+            <td class="num">12</td>
+            <td>Pick the relevant short document; we keep packets short on purpose.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Scoring is automatic (<code>modules/grader.py</code>): number ranges, multiple choice, yes/no, or pattern checks. <strong>No</strong> second model judges the answers. Pattern checks on Domains 2 and 4 are a known weakness; Domain 1 carries most of the scientific weight.
+      </p>
+
+      <h3>3.6 Machine and decoding</h3>
+      <ul>
+        <li>Local compressed model <code>Muse-Glimmer-30B-exl3-2.00bpw</code> via TabbyAPI on loopback (host/port only in a private environment variable).</li>
+        <li>Hardware class: RTX 3060 12 GB; one inference job at a time.</li>
+        <li>Smoke test (2026-09-09): task <code>d1.01</code>, baseline instructions, <strong>15.035 s</strong>, answer about 4.7% (accepted band 4.5–5.0).</li>
+        <li>Decoding: temperature 0.2, top_p 0.9, seeds 42, 43, 44 by default.</li>
+        <li>Extra check on larger APIs (Gemini 3.8 Flash): first 10 Domain-1 tasks, documents off, one seed, all four instruction styles.</li>
+      </ul>
+      <p>The full local run took approximately 14 hours wall-clock on the RTX 3060.</p>
+
+      <h3>3.7 What we measure and what we predict</h3>
+      <p>Each trial is right (<em>y = 1</em>) or wrong (<em>y = 0</em>). The model also writes a confidence <em>p̂</em> between 0 and 1.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Measure</th>
+            <th>Plain meaning</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Accuracy</strong></td>
+            <td>Share of correct answers</td>
+            <td>Main quality</td>
+          </tr>
+          <tr>
+            <td><strong>MCE</strong></td>
+            <td>Average of |p̂ − y| — how far confidence is from being right</td>
+            <td>Hypothesis 1</td>
+          </tr>
+          <tr>
+            <td><strong>Brier</strong></td>
+            <td>Same idea with squared error (p̂ − y)²</td>
+            <td>Reported with H1</td>
+          </tr>
+          <tr>
+            <td><strong>Document gap (GDI)</strong></td>
+            <td>Accuracy with documents minus accuracy without</td>
+            <td>Hypothesis 2</td>
+          </tr>
+          <tr>
+            <td><strong>Tool use (Domain 2)</strong></td>
+            <td>How often it actually inspects before answering</td>
+            <td>Hypothesis 3</td>
+          </tr>
+          <tr>
+            <td><strong>Dangerous action rate (Domain 3)</strong></td>
+            <td>How often the final action field contains a forbidden command</td>
+            <td>Hypothesis 3 safety</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>H1:</strong> Check-yourself and careful-checklist should have <strong>lower</strong> MCE than plain step-by-step (one-sided tests, Holm-adjusted).<br />
+        <strong>H1-secondary:</strong> Same idea for the two-draft style.<br />
+        <strong>H2:</strong> Check-yourself should <strong>shrink</strong> the gap between "with documents" and "without" (seek evidence with tools when documents are missing).<br />
+        <strong>H3:</strong> Check-yourself should use inspection tools <strong>more</strong> on Domain 2, without raising dangerous actions on Domain 3.
+      </p>
+
+      <h3>3.8 Statistics, in plain terms</h3>
+      <p>
+        We treat <strong>the task</strong> as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. The statistical pipeline is implemented in <code>analysis/analyze.py</code>.
+      </p>
+    </section>
+
+    <section id="section-4">
+      <h2>4. Execution status</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Piece</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>types/conditions.json</code></td>
+            <td>Four instruction styles + forbidden-word list</td>
+          </tr>
+          <tr>
+            <td><code>modules/compiler.py</code> / <code>grader.py</code></td>
+            <td>Built & hardened; <strong>17 unit tests pass</strong></td>
+          </tr>
+          <tr>
+            <td><code>benchmark/dataset.json</code></td>
+            <td>60 tasks with documents and scorers</td>
+          </tr>
+          <tr>
+            <td><code>benchmark/run_battery.py</code></td>
+            <td>Complete: executed <strong>1,440</strong> trials</td>
+          </tr>
+          <tr>
+            <td><code>analysis/analyze.py</code></td>
+            <td>Built: MixedLM mixed-effects pipeline + Holm correction</td>
+          </tr>
+          <tr>
+            <td>OSF registration</td>
+            <td><a href="https://osf.io/gzjrd/overview">osf.io/gzjrd/overview</a> (Project: <a href="https://osf.io/p9tcy/">osf.io/p9tcy</a>)</td>
+          </tr>
+          <tr>
+            <td>Primary battery</td>
+            <td><strong>1,440 / 1,440 trials complete</strong> (<code>results/battery_20260909_233434.jsonl</code>)</td>
+          </tr>
+          <tr>
+            <td>Secondary cloud check</td>
+            <td><strong>40 / 40 trials complete</strong> on Gemini Flash (<code>results/battery_gemini_flash.jsonl</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="section-5">
+      <h2>5. Empirical results</h2>
+
+      <h3>5.1 Primary substrate (Muse-Glimmer-30B-exl3-2.00bpw)</h3>
+      <p>Trial-level performance across 1,440 runs:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Condition</th>
+            <th class="num">Accuracy</th>
+            <th class="num">MCE (↓)</th>
+            <th class="num">Brier (↓)</th>
+            <th class="num">GDI (ON−OFF)</th>
+            <th class="num">Dom2 Tool Rate</th>
+            <th class="num">Dom3 Forbidden Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>cot</code></td>
+            <td class="num">0.894</td>
+            <td class="num">0.179</td>
+            <td class="num">0.089</td>
+            <td class="num">+0.156</td>
+            <td class="num">0.319</td>
+            <td class="num">0.042</td>
+          </tr>
+          <tr>
+            <td><code>verify</code></td>
+            <td class="num">0.911</td>
+            <td class="num">0.207</td>
+            <td class="num">0.108</td>
+            <td class="num">+0.100</td>
+            <td class="num">0.514</td>
+            <td class="num">0.097</td>
+          </tr>
+          <tr>
+            <td><code>dual</code></td>
+            <td class="num">0.869</td>
+            <td class="num">0.194</td>
+            <td class="num">0.104</td>
+            <td class="num">+0.117</td>
+            <td class="num">0.236</td>
+            <td class="num">0.056</td>
+          </tr>
+          <tr>
+            <td><code>high_c</code></td>
+            <td class="num"><strong>0.922</strong></td>
+            <td class="num"><strong>0.178</strong></td>
+            <td class="num"><strong>0.088</strong></td>
+            <td class="num">+0.100</td>
+            <td class="num">0.375</td>
+            <td class="num"><strong>0.028</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>5.2 Confirmatory hypothesis testing (MixedLM with Holm correction)</h3>
+      <ol>
+        <li>
+          <strong>H1 (Calibration): Not supported.</strong> <code>high_c</code> slightly reduces MCE vs <code>cot</code> (−0.001, p=0.95), while <code>verify</code> increases MCE (+0.028, p=0.13). Verbal confidence numbers on this 2.00 bpw model remain largely decoupled from true error.
+        </li>
+        <li>
+          <strong>H2 (RAG reliance gap): Inconclusive / Directionally supported.</strong> The <code>verify</code> protocol shrinks the open-book accuracy gap by 5.6 percentage points (interaction coef = −0.056, z = −1.06, one-sided p = 0.144), but does not reach the α = 0.05 threshold.
+        </li>
+        <li>
+          <strong>H3 (Tool use): Supported (coef = +0.194, Holm p = 0.015).</strong> Verification prompts significantly boost inspection tool calls on Domain 2 without a significant increase in true destructive actions on Domain 3.
+          <br /><em>Adversarial note on H3:</em> This finding is largely an instruction-following validation, as the <code>verify</code> prompt directly commands the model to request tools when possible.
+        </li>
+      </ol>
+
+      <h3>5.3 Secondary cloud substrate (Gemini Flash)</h3>
+      <p>Ten Domain-1 reasoning tasks (<code>d1.01</code>–<code>d1.10</code>), RAG OFF, seed 42:</p>
+      <ul>
+        <li>Accuracy: <strong>100% (40/40)</strong> across all 4 conditions (<code>cot</code>, <code>verify</code>, <code>dual</code>, <code>high_c</code>).</li>
+        <li>MCE: <code>high_c</code> achieved lowest calibration error (0.003), followed by <code>dual</code> (0.005), <code>cot</code> (0.006), and <code>verify</code> (0.009).</li>
+      </ul>
+    </section>
+
+    <section id="section-6">
+      <h2>6. Methodological lessons & evaluation audit</h2>
+      <p>
+        A critical red-team audit revealed that initial reports of ~78% accuracy were suppressed by naive regex parsing in the original evaluation script:
+      </p>
+      <ol>
+        <li>
+          <strong>Numeric greedy match:</strong> <code>canonicalize()</code> selected the first number in the text, so <code>"P(cause 3)=0.5"</code> extracted <code>3</code> instead of <code>0.5</code>, failing 16 valid numeric trials.
+        </li>
+        <li>
+          <strong>Choice comparison grepping:</strong> Answers stating <em>"Option 1 is more probable than Option 2"</em> matched both options and failed 31 valid choice trials.
+        </li>
+        <li>
+          <strong>Safety refusal penalties:</strong> 84% of recorded "forbidden hits" in Domain 3 were safe refusals where the model quoted the dangerous command while refusing it.
+        </li>
+      </ol>
+      <div class="callout">
+        Because structured protocols (<code>verify</code> and <code>high_c</code>) naturally generate complete explanatory sentences, they were disproportionately penalized by these grader defects. Once hardened, <code>high_c</code> emerged as the top-performing operational condition overall.
+      </div>
+    </section>
+
+    <section id="closing">
+      <h2>Closing</h2>
+      <p>
+        BrainSkill demonstrates that operational instructions without personality labels alter model behavior on a small edge LLM:
+      </p>
+      <ul>
+        <li>A careful checklist (<code>high_c</code>) delivers the highest overall accuracy (92.2%) and lowest dangerous action rate (2.8%).</li>
+        <li>Verification instructions drive tool inspection (+19.4%), but do not provide a free metacognitive calibration upgrade.</li>
+        <li>Frontier cloud models (Gemini Flash) solve the epistemic trap battery at 100% ceiling, showing that reasoning failures on these tasks are heavily tied to model capacity and aggressive quantization.</li>
+      </ul>
+    </section>
+
+    <section id="links">
+      <h2>Repository and open data</h2>
+      <ul>
+        <li><a href="index.html"><strong>Interactive study landing page</strong></a></li>
+        <li><a href="https://github.com/pedjaurosevic/brainskill">GitHub repository</a></li>
+        <li><a href="https://github.com/pedjaurosevic/brainskill/tree/brainskill-freeze-v3.1">Freeze tag <code>brainskill-freeze-v3.1</code></a></li>
+        <li><a href="https://github.com/pedjaurosevic/brainskill/blob/main/WHITEPAPER.md">Whitepaper Markdown source</a> ·
+            <a href="https://github.com/pedjaurosevic/brainskill/blob/main/analysis/ANALYSIS.md">Full analysis report</a> ·
+            <a href="https://github.com/pedjaurosevic/brainskill/blob/main/FREEZE.md">FREEZE.md</a></li>
+        <li>OSF project: <a href="https://osf.io/p9tcy/">osf.io/p9tcy</a> ·
+            Preregistration: <a href="https://osf.io/gzjrd/">osf.io/gzjrd</a></li>
+        <li>Trial log release: <a href="https://github.com/pedjaurosevic/brainskill/releases/tag/results-v3.1">results-v3.1</a> (full JSONL data)</li>
+      </ul>
+    </section>
+
+    <footer>
+      BrainSkill · Predrag Urošević · 2026.
+      Public write-up of a completed confirmatory run. Not medical, legal, or deployment advice.
+      Inference host/port intentionally omitted.
+    </footer>
+  </div>
+</body>
+</html>

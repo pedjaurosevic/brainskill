@@ -18,7 +18,7 @@ The model **never** sees brand names like INTJ, Kahneman, or "System 1". We only
 
 We will compare **four instruction styles**, each with and without a fixed set of helper documents, across **60 tasks**, repeated **3 times**. That is **1,440** scored runs. When we use the "two drafts" style, our runner—not the model—decides whether the drafts disagree and whether a careful second pass is needed.
 
-The model under test is a compressed local model (`Muse-Glimmer-30B-exl3-2.00bpw`) served by TabbyAPI on this machine only (exact address kept private). The dataset, prompt builder, automatic scorer, and runner already exist; nine unit tests pass; a dry run plans 1,440 trials. The full battery has **not** been started. Before we freeze and preregister, we still need fuller fake tool outputs for some Linux tasks, one timed tool-loop test, and a proper retry rule when the API fails.
+The model under test is a compressed local model (`Muse-Glimmer-30B-exl3-2.00bpw`) served by TabbyAPI on this machine only (exact address kept private). The full battery of 1,440 scored trials has been completed and analyzed alongside a 40-trial secondary cloud validation on Gemini Flash. All 17 unit tests pass.
 
 ---
 
@@ -47,7 +47,7 @@ This is not a full literature review. Citations match `library/PAPERS.md` (check
 - **Butlin et al. (arXiv:2308.08708).** Work on consciousness indicators. Used here as a **warning label**: our JSON answer format is not a claim about consciousness.
 - **Courchaine, Sethi, Qiu (WWW Companion 2026).** Metacognition ideas for *groups* of models. Cite the conference PDF; do not cite the old unverified arXiv id from our earlier draft.
 
-Until we have run logs from the full battery, BrainSkill is a **design and test harness**, not an empirical advance over these papers.
+With the execution of the 1,440-trial battery, BrainSkill provides empirical data on how these operational instructions perform in practice on edge hardware.
 
 ---
 
@@ -115,7 +115,7 @@ Scoring is automatic (`modules/grader.py`): number ranges, multiple choice, yes/
 - Decoding: temperature 0.2, top_p 0.9, seeds 42, 43, 44 by default.
 - Extra check on larger APIs (Gemini 3.8 Flash and/or Grok): only the first 10 Domain-1 tasks, documents off, one seed, all four instruction styles—we only ask whether the *direction* of the effect matches.
 
-Rough time for the full local run, including extra drafts: about **8–24 hours** wall-clock. We have not yet timed a Domain-2 tool loop.
+The full local run took approximately 14 hours wall-clock on the RTX 3060.
 
 ### 3.7 What we measure and what we predict
 
@@ -139,7 +139,7 @@ We dropped old absolute cutoffs ("MCE must be below X") because we had no pilot.
 
 ### 3.8 Statistics, in plain terms
 
-We treat **the task** as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. Spec says: retry a failed HTTP call once, then score wrong—**the runner does not implement that yet**. The analysis script is **not in the repo yet**.
+We treat **the task** as the unit we want to generalize to. The three seeds are repeats for noise, not 1,440 independent tasks. Analysis: mixed-effects model with a random intercept per task; compare each style to step-by-step; Holm correction on the planned family of tests. After freeze: no editing prompts, rubrics, or items. The statistical pipeline is implemented in `analysis/analyze.py`.
 
 ---
 

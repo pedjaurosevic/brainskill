@@ -3,7 +3,7 @@
 **Label-blind operational protocols vs chain-of-thought on an edge LLM**  
 Confirmatory study by Predrag Urošević (2026).
 
-> Public results poster: **https://pedjaurosevic.github.io/brainskill/**
+> Public results poster: **https://pedjaurosevic.github.io/brainskill/** · [Read Whitepaper](https://pedjaurosevic.github.io/brainskill/whitepaper.html)
 
 ## One-sentence result
 
@@ -37,7 +37,7 @@ On `Muse-Glimmer-30B-exl3-2.00bpw`, a careful checklist protocol (`high_c`) achi
 
 | Path | Role |
 | --- | --- |
-| `WHITEPAPER.md` | Full methods write-up & empirical report |
+| [`WHITEPAPER.md`](WHITEPAPER.md) | Full methods write-up & empirical report ([Web HTML](https://pedjaurosevic.github.io/brainskill/whitepaper.html)) |
 | `PLAN.md` / `PREREGISTRATION.md` | Confirmatory specification |
 | `FREEZE.md` | SHA-256 freeze snapshot |
 | `types/conditions.json` | Four label-blind conditions + denylist |
