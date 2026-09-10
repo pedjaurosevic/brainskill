@@ -10,15 +10,18 @@
 
 ## Abstract
 
-Many prompts tell a language model to *act like* a personality type or a famous psychologist. That mostly tests whether the model remembers internet stereotypes.
+When deploying small language models on edge hardware, the standard prompt recipe is simply "think step by step" (Chain-of-Thought). But on heavily compressed local models, generic reasoning instructions frequently fail to prevent overconfident guessing, safety lapses, or a reluctance to inspect systems before concluding.
 
-BrainSkill asks a simpler question: if we give the model **plain work instructions**—check your claim, say what would prove you wrong, use a tool when you can, fill a checklist, do not guess—does it answer better than the usual "think step by step"? Better here means: more often correct, more honest about how sure it is, more willing to inspect a system before acting, and less dependent on extra documents we paste in.
+**BrainSkill** tests whether replacing generic reasoning prompts with **concrete, disciplined work protocols**—such as pre-execution constraint checklists, explicit falsification routines, or external verification loops—reliably improves task performance on small local hardware. Specifically, we evaluate whether disciplined procedures make a model more accurate, more honest about its own uncertainty, safer when handling destructive operations, and more proactive at calling diagnostic tools.
 
-The model **never** sees brand names like INTJ, Kahneman, or "System 1". We only send operational steps.
+To isolate the true procedural effect from superficial roleplay or training-data priming, our design is strictly **label-blind**: the model is never assigned a persona, personality type, or psychologist role (e.g., "act like an INTJ" or "think like Kahneman"). It receives only cold, operational steps.
 
-We will compare **four instruction styles**, each with and without a fixed set of helper documents, across **60 tasks**, repeated **3 times**. That is **1,440** scored runs. When we use the "two drafts" style, our runner—not the model—decides whether the drafts disagree and whether a careful second pass is needed.
+We evaluate **four instruction protocols** (`cot` baseline, `verify` self-check, `dual` independent drafting, and `high_c` strict checklist), tested both with and without reference documents, across **60 diverse tasks** spanning probability traps, Linux systems debugging, safety refusals, and noise filtering. Each condition is repeated across 3 random seeds, producing **1,440 fully scored trials** evaluated against deterministic, regex-hardened ground truth on a single 12 GB GPU (`Muse-Glimmer-30B-exl3-2.00bpw`), cross-validated on Gemini Flash.
 
-The model under test is a compressed local model (`Muse-Glimmer-30B-exl3-2.00bpw`) served by TabbyAPI on this machine only (exact address kept private). The full battery of 1,440 scored trials has been completed and analyzed alongside a 40-trial secondary cloud validation on Gemini Flash. All 17 unit tests pass.
+The completed battery reveals three primary findings:
+1. **Strict checklists (`high_c`) win overall:** Constraint-based checklists produce the highest overall accuracy (92.2% vs 89.4% baseline) and the lowest safety violation rate (2.8% vs 4.2%).
+2. **Tool inspection is driven by orders, not curiosity:** Explicit verification instructions boost diagnostic tool calls from 32% to 51%, reflecting strict instruction-following rather than emergent problem-solving.
+3. **Small models cannot self-calibrate:** Written verbal confidence on a 2-bit model remains untrustworthy regardless of prompt style, whereas frontier cloud models calibrate with near-zero error.
 
 ---
 

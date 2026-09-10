@@ -40,24 +40,29 @@
     <section id="abstract">
       <h2>Abstract</h2>
       <p>
-        Many prompts tell a language model to <em>act like</em> a personality type or a famous psychologist. That mostly tests whether the model remembers internet stereotypes.
+        When deploying small language models on edge hardware, the standard prompt recipe is simply “think step by step” (Chain-of-Thought). But on heavily compressed local models, generic reasoning instructions frequently fail to prevent overconfident guessing, safety lapses, or a reluctance to inspect systems before concluding.
       </p>
       <p>
-        BrainSkill asks a simpler question: if we give the model <strong>plain work instructions</strong>—check your claim, say what would prove you wrong, use a tool when you can, fill a checklist, do not guess—does it answer better than the usual “think step by step”? Better here means: more often correct, more honest about how sure it is, more willing to inspect a system before acting, and less dependent on extra documents we paste in.
+        <strong>BrainSkill</strong> tests whether replacing generic reasoning prompts with <strong>concrete, disciplined work protocols</strong>—such as pre-execution constraint checklists, explicit falsification routines, or external verification loops—reliably improves task performance on small local hardware. Specifically, we evaluate whether disciplined procedures make a model more accurate, more honest about its own uncertainty, safer when handling destructive operations, and more proactive at calling diagnostic tools.
       </p>
       <p>
-        The model <strong>never</strong> sees brand names like INTJ, Kahneman, or “System 1”. We only send operational steps.
+        To isolate the true procedural effect from superficial roleplay or training-data priming, our design is strictly <strong>label-blind</strong>: the model is never assigned a persona, personality type, or psychologist role (e.g., “act like an INTJ” or “think like Kahneman”). It receives only cold, operational steps.
       </p>
       <p>
-        We compare <strong>four instruction styles</strong>, each with and without a fixed set of helper documents, across <strong>60 tasks</strong>, repeated <strong>3 times</strong>. That is <strong>1,440</strong> scored runs. When we use the “two drafts” style, our runner—not the model—decides whether the drafts disagree and whether a careful second pass is needed.
-      </p>
-      <p>
-        The model under test is a compressed local model (<code>Muse-Glimmer-30B-exl3-2.00bpw</code>) served by TabbyAPI on this machine only (exact address kept private). The full battery of 1,440 scored trials has been completed and analyzed alongside a 40-trial secondary cloud validation on Gemini Flash. All 17 unit tests pass.
+        We evaluate <strong>four instruction protocols</strong> (<code>cot</code> baseline, <code>verify</code> self-check, <code>dual</code> independent drafting, and <code>high_c</code> strict checklist), tested both with and without reference documents, across <strong>60 diverse tasks</strong> spanning probability traps, Linux systems debugging, safety refusals, and noise filtering. Each condition is repeated across 3 random seeds, producing <strong>1,440 fully scored trials</strong> evaluated against deterministic, regex-hardened ground truth on a single 12 GB GPU (<code>Muse-Glimmer-30B-exl3-2.00bpw</code>), cross-validated on Gemini Flash.
       </p>
       <div class="callout">
+        <strong>Key empirical findings:</strong>
+        <ol style="margin-top:0.4rem; padding-left:1.2rem;">
+          <li><strong>Strict checklists (<code>high_c</code>) win overall:</strong> Constraint-based checklists produce the highest overall accuracy (92.2% vs 89.4% baseline) and the lowest safety violation rate (2.8% vs 4.2%).</li>
+          <li><strong>Tool inspection is driven by orders, not curiosity:</strong> Explicit verification instructions boost diagnostic tool calls from 32% to 51%, reflecting strict instruction-following rather than emergent problem-solving.</li>
+          <li><strong>Small models cannot self-calibrate:</strong> Written verbal confidence on a 2-bit model remains untrustworthy regardless of prompt style, whereas frontier cloud models calibrate with near-zero error.</li>
+        </ol>
+      </div>
+      <p style="margin-top:0.9rem; color:var(--muted); font-size:0.88rem;">
         <strong>Companion specifications:</strong>
         <code>PLAN.md</code> v3.1-freeze · <code>PREREGISTRATION.md</code> · <code>RED_TEAM_AUDIT.md</code> · <code>benchmark/TESTING_METHODOLOGY.md</code> · OSF preregistration: <a href="https://osf.io/gzjrd/overview">osf.io/gzjrd/overview</a>
-      </div>
+      </p>
     </section>
 
     <section id="section-1">

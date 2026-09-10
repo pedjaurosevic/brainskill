@@ -35,20 +35,24 @@
     </nav>
 
     <section id="question">
-      <h2>1. What we asked</h2>
+      <h2>1. What we asked (In plain terms)</h2>
       <p>
-        Many prompts say “you are an INTJ” or “think like Kahneman.” That mostly measures
-        <em>stereotype recall</em>. We asked something narrower:
+        When building AI agents on local hardware, standard prompting relies heavily on vague instructions like
+        <em>“think step by step”</em>. But on compressed edge models, generic reasoning prompts often fail to stop
+        overconfident guessing, dangerous commands, or unverified assumptions.
       </p>
       <div class="callout">
-        <strong>If the model only sees concrete steps</strong> — state a claim, name what would refute it,
-        use a tool when that helps, update, set confidence; or use a careful checklist —
-        does that change accuracy, verbal calibration, tool use, and dependence on pasted documents,
-        compared with plain “think step by step”?
+        <strong>The practical engineering question:</strong>
+        If we replace vague reasoning prompts with <strong>concrete work protocols</strong> —
+        such as checking claims against failure modes, verifying with diagnostic tools before concluding,
+        or following an explicit constraint checklist — does that improve accuracy, reduce destructive mistakes,
+        and encourage tool use compared to standard chain-of-thought?
       </div>
       <p>
-        Jung / Luria / Friston / Sternberg ideas stayed <strong>parked</strong>. This run is only four
-        operational conditions, not a personality study and not a consciousness claim.
+        <strong>Why no personality labels?</strong> Many prompts tell models to <em>“act like an INTJ”</em> or
+        <em>“think like Kahneman”</em>. That mostly measures <em>stereotype recall</em> from training data.
+        To test pure procedures rather than pop-psychology priming, the model only ever sees cold, operational steps.
+        Jung, Luria, Friston, and Sternberg ideas stay firmly parked.
       </p>
     </section>
 
